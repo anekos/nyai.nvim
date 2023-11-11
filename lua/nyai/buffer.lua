@@ -1,11 +1,11 @@
 local M = {}
 
 local extract_role = function(line)
-  if line == '<USER>' then
+  if line == '<user>' then
     return 'user'
-  elseif line == '<ASSISTANT>' then
+  elseif line == '<assistant>' then
     return 'assistant'
-  elseif line == '<SYSTEM>' then
+  elseif line == '<system>' then
     return 'system'
   else
     return nil
