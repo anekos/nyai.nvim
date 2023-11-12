@@ -1,24 +1,28 @@
-syntax match userTag /<user>/ contained
-syntax region userContent start=/<user>/ end=/\./ contains=userTag
+scriptencoding utf-8
 
-syntax match systemTag /<system>/ contained
-syntax region systemContent start=/<system>/ end=/\./ contains=systemTag
+" syntax reset
 
-syntax match assistantTag /<assistant>/ contained
-syntax region assistantContent start=/<assistant>/ end=/\./ contains=assistantTag
+syntax match userTag /^<🤔\?user>$/ contained
+syntax region userContent start=/^<🤔\?user>$/ end=/^\.$/ contains=userTag
+
+syntax match systemTag /^<🖥\?system>$/ contained
+syntax region systemContent start=/^<🖥\?system>$/ end=/^\.$/ contains=systemTag
+
+syntax match assistantTag /^<🤖\?assistant>$/ contained
+syntax region assistantContent start=/^<🤖\?assistant>$/ end=/^\.$/ contains=assistantTag
 
 syntax match waitingTag /<WAITING>/
 
-highlight userTag cterm=bold gui=bold guibg=red
+highlight link userTag Title
 highlight link userContent Comment
 
-highlight systemTag cterm=bold gui=bold guibg=green
-highlight link systemContent Comment
+highlight link systemTag userTag
+highlight link systemContent userContent
 
-highlight assistantTag cterm=bold gui=bold guibg=blue
-highlight link assistantContent Comment
+highlight link assistantTag userTag
+highlight link assistantContent userContent
 
-highlight waitingTag cterm=bold gui=bold guibg=red
+highlight link waitingTag WarningMsg
 
 " function! s:show()
 "     let l:syntaxgroup = synIDattr(synID(line('.'), col('.'), 1), 'name')
