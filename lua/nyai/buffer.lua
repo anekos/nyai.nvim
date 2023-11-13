@@ -31,16 +31,15 @@ function M.get_parameters()
   local current = nil
 
   for _, line in ipairs(lines) do
-    local role = extract_role(line)
-
-    if role == nil then
-      try_to_set_parameters(line, parameters)
-    else
-      current = { role = role, content = {} }
-      goto continue
-    end
-
     if current == nil then
+      local role = extract_role(line)
+
+      if role == nil then
+        try_to_set_parameters(line, parameters)
+      else
+        current = { role = role, content = {} }
+      end
+
       goto continue
     end
 
