@@ -1,7 +1,10 @@
 local api = require('nyai.api')
 local buffer = require('nyai.buffer')
+local util = require('nyai.util')
 
 local M = {}
+
+local dir = vim.fn.expand('~/.config/nvim/nyai')
 
 function M.run()
   local current_buffer = vim.api.nvim_get_current_buf()
@@ -33,6 +36,48 @@ function M.run()
   end
 
   vim.api.nvim_buf_set_lines(current_buffer, -1, -1, true, { '', '<WAITING>' })
+
+  api.chat_completions(parameters, function(body)
+    vim.schedule(function()
+      on_resp(vim.fn.json_decode(body))
+    end)
+  end)
+end
+
+function M.run_with_template(name)
+  local file_path = dir .. '/' .. name .. '.nyai'
+  local content = vim.fn.join(vim.fn.readfile(file_path), '\n')
+  local embedded = string.gsub(content, '{{_select_}}', util.selected_text())
+
+  local parameters = {
+    model = 'gpt-3.5-turbo',
+    messages = {
+      { role = 'user', content = embedded },
+    },
+  }
+
+  local on_resp = function(body)
+    local lines = { '<user>' }
+
+    for _, line in ipairs(vim.split(embedded, '\n')) do
+      table.insert(lines, line)
+    end
+
+    table.insert(lines, '.')
+    table.insert(lines, '')
+    table.insert(lines, '<assistant>')
+
+    for _, line in ipairs(vim.split(body.choices[1].message.content, '\n')) do -- FIXME ?
+      table.insert(lines, line)
+    end
+
+    table.insert(lines, '')
+    table.insert(lines, '<user>')
+
+    util.new_buffew_with(lines)
+
+    vim.bo.filetype = 'nyai'
+  end
 
   api.chat_completions(parameters, function(body)
     vim.schedule(function()
