@@ -44,7 +44,7 @@ function M.run()
   end)
 end
 
-function M.run_with_template(name)
+function M.run_with_template(name, replace)
   local file_path = dir .. '/' .. name .. '.nyai'
   local content = vim.fn.join(vim.fn.readfile(file_path), '\n')
   local embedded = string.gsub(content, '{{_select_}}', util.selected_text())
@@ -57,6 +57,17 @@ function M.run_with_template(name)
   }
 
   local on_resp = function(body)
+    local anwser = {}
+
+    for _, line in ipairs(vim.split(body.choices[1].message.content, '\n')) do -- FIXME ?
+      table.insert(anwser, line)
+    end
+
+    if replace then
+      util.replace_selection(vim.fn.join(anwser, '\n'))
+      return
+    end
+
     local lines = { '<user>' }
 
     for _, line in ipairs(vim.split(embedded, '\n')) do
@@ -67,7 +78,7 @@ function M.run_with_template(name)
     table.insert(lines, '')
     table.insert(lines, '<assistant>')
 
-    for _, line in ipairs(vim.split(body.choices[1].message.content, '\n')) do -- FIXME ?
+    for _, line in ipairs(anwser) do -- FIXME ?
       table.insert(lines, line)
     end
 

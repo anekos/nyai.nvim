@@ -19,4 +19,11 @@ function M.new_buffew_with(lines)
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 end
 
+function M.replace_selection(content)
+  local old = vim.fn.getreg('s', 1)
+  vim.fn.setreg('s', content, 1)
+  vim.cmd('silent normal! gv"sp')
+  vim.fn.setreg('s', old, 1)
+end
+
 return M

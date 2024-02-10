@@ -10,6 +10,7 @@ vim.api.nvim_create_autocmd({ 'FileType' }, {
 })
 
 vim.api.nvim_create_user_command('Nyai', function(a)
-  -- print(vim.inspect(a.args))
-  action.run_with_template(a.args)
-end, { nargs = 1, complete = require('nyai.completion').complete_templates, range = true })
+  -- print(vim.inspect(a))
+  -- print(vim.inspect(a.bang))
+  action.run_with_template(a.args, a.bang)
+end, { nargs = 1, complete = require('nyai.completion').complete_templates, range = true, bang = true })
