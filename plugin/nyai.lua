@@ -12,5 +12,10 @@ vim.api.nvim_create_autocmd({ 'FileType' }, {
 vim.api.nvim_create_user_command('Nyai', function(a)
   -- print(vim.inspect(a))
   -- print(vim.inspect(a.bang))
-  action.run_with_template(a.args, a.bang)
-end, { nargs = 1, complete = require('nyai.completion').complete_templates, range = true, bang = true })
+  if #a.args == 0 then
+    local fname = vim.fn.strftime('~/nyai/%Y%m%d-%H%M.nyai')
+    vim.cmd.edit(fname)
+  else
+    action.run_with_template(a.args, a.bang)
+  end
+end, { nargs = '*', complete = require('nyai.completion').complete_templates, range = true, bang = true })
