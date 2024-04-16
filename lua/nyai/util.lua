@@ -12,6 +12,11 @@ function M.selected_text()
   return result
 end
 
+function M.buffer_text()
+  local current_buffer = vim.api.nvim_get_current_buf()
+  return vim.fn.join(vim.api.nvim_buf_get_lines(current_buffer, 0, -1, false), '\n')
+end
+
 function M.new_buffew_with(lines)
   vim.cmd.tabnew()
   local buf = vim.api.nvim_create_buf(false, true)

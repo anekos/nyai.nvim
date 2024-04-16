@@ -48,6 +48,7 @@ function M.run_with_template(name, replace)
   local file_path = dir .. '/' .. name .. '.nyai'
   local content = vim.fn.join(vim.fn.readfile(file_path), '\n')
   local embedded = string.gsub(content, '{{_select_}}', util.selected_text())
+  embedded = string.gsub(embedded, '{{_buffer_}}', util.buffer_text())
 
   local parameters = {
     model = 'gpt-3.5-turbo',
