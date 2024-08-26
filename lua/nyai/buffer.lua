@@ -25,7 +25,8 @@ end
 function M.get_parameters()
   local lines = vim.fn.getline(1, '$')
   local parameters = {
-    model = 'gpt-3.5-turbo',
+    -- model = 'gpt-3.5-turbo',
+    model = 'llama-3.1-sonar-small-128k-chat',
   }
   local messages = {}
   local current = nil
