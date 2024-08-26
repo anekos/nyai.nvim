@@ -1,6 +1,6 @@
 local persistent = require('nyai.persistent')
-local action = require('nyai.action')
 local event = require('nyai.event')
+local command = require('nyai.command')
 local config = require('nyai.config')
 
 local M = {}
@@ -32,31 +32,13 @@ function M.setup(opts)
     callback = event.on_vim_leave_pre,
   })
 
-  vim.api.nvim_create_user_command('NyaiChat', function(a)
-    -- print(vim.inspect(a))
-    -- print(vim.inspect(a.bang))
-    if #a.args == 0 then
-      local fname = vim.fn.strftime('~/nyai/%Y%m%d-%H%M.nyai')
-      vim.cmd.edit(fname)
-    else
-      action.run_with_template(a.args, a.bang)
-    end
-  end, { nargs = '*', complete = require('nyai.completion').complete_templates, range = true, bang = true })
+  vim.api.nvim_create_user_command(
+    'NyaiChat',
+    command.chat,
+    { nargs = '*', complete = require('nyai.completion').complete_templates, range = true, bang = true }
+  )
 
-  vim.api.nvim_create_user_command('NyaiModel', function(a)
-    if vim.trim(a.args) ~= '' then
-      config.model = config.get_model(a.args)
-      return
-    end
-    vim.ui.select(config.all_models(), {
-      prompt = 'Select model',
-      format_item = function(model)
-        return model.name
-      end,
-    }, function(model)
-      config.model = model
-    end)
-  end, {
+  vim.api.nvim_create_user_command('NyaiModel', command.model, {
     nargs = '*',
     complete = config.model_names,
     range = true,
