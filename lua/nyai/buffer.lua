@@ -1,3 +1,5 @@
+local config = require('nyai.config')
+
 local M = {}
 
 local extract_role = function(line)
@@ -25,8 +27,7 @@ end
 function M.get_parameters()
   local lines = vim.fn.getline(1, '$')
   local parameters = {
-    -- model = 'gpt-3.5-turbo',
-    model = 'llama-3.1-sonar-small-128k-chat',
+    model = config.model.id,
   }
   local messages = {}
   local current = nil

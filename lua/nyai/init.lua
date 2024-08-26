@@ -23,7 +23,7 @@ function M.setup(opts)
     callback = event.on_cr,
   })
 
-  vim.api.nvim_create_user_command('Nyai', function(a)
+  vim.api.nvim_create_user_command('NyaiChat', function(a)
     -- print(vim.inspect(a))
     -- print(vim.inspect(a.bang))
     if #a.args == 0 then
@@ -33,6 +33,15 @@ function M.setup(opts)
       action.run_with_template(a.args, a.bang)
     end
   end, { nargs = '*', complete = require('nyai.completion').complete_templates, range = true, bang = true })
+
+  vim.api.nvim_create_user_command('NyaiModel', function(a)
+    config.model = config.get_model(a.args)
+  end, {
+    nargs = '*',
+    complete = config.model_names,
+    range = true,
+    bang = true,
+  })
 end
 
 return M

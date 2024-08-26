@@ -1,3 +1,4 @@
+local config = require('nyai.config')
 local api = require('nyai.api')
 local buffer = require('nyai.buffer')
 local util = require('nyai.util')
@@ -51,7 +52,7 @@ function M.run_with_template(name, replace)
   embedded = string.gsub(embedded, '{{_buffer_}}', util.buffer_text())
 
   local parameters = {
-    model = 'gpt-3.5-turbo',
+    model = config.model.id,
     messages = {
       { role = 'user', content = embedded },
     },
