@@ -1,3 +1,4 @@
+local persistent = require('nyai.persistent')
 local action = require('nyai.action')
 local vutil = require('nyai.util')
 
@@ -13,6 +14,10 @@ function M.on_cr()
       vutil.feedkeys('<CR>')
     end
   end, { expr = true, buffer = true })
+end
+
+function M.on_vim_leave_pre()
+  persistent.save_state()
 end
 
 return M

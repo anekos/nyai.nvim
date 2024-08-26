@@ -1,8 +1,9 @@
-local M = {}
-
+local persistent = require('nyai.persistent')
 local action = require('nyai.action')
 local event = require('nyai.event')
 local config = require('nyai.config')
+
+local M = {}
 
 function M.setup(opts)
   local function apply(name)
@@ -15,12 +16,20 @@ function M.setup(opts)
   apply('api_end_point')
   apply('api_key')
 
+  persistent.load_state()
+
   local group = vim.api.nvim_create_augroup('Nyai', { clear = true })
 
   vim.api.nvim_create_autocmd({ 'FileType' }, {
     group = group,
     pattern = 'nyai',
     callback = event.on_cr,
+  })
+
+  vim.api.nvim_create_autocmd({ 'VimLeavePre' }, {
+    group = group,
+    pattern = '*',
+    callback = event.on_vim_leave_pre,
   })
 
   vim.api.nvim_create_user_command('NyaiChat', function(a)
