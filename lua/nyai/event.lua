@@ -14,6 +14,15 @@ function M.on_cr()
       vutil.feedkeys('<CR>')
     end
   end, { expr = true, buffer = true })
+
+  vim.keymap.set('i', '<C-CR>', function()
+    if vim.fn.getline('.') ~= '.' then
+      vutil.feedkeys('<CR>.')
+    end
+    vim.schedule(function()
+      action.run()
+    end)
+  end, { expr = true, buffer = true })
 end
 
 function M.on_vim_leave_pre()
