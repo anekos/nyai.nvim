@@ -35,7 +35,18 @@ function M.setup(opts)
   end, { nargs = '*', complete = require('nyai.completion').complete_templates, range = true, bang = true })
 
   vim.api.nvim_create_user_command('NyaiModel', function(a)
-    config.model = config.get_model(a.args)
+    if vim.trim(a.args) ~= '' then
+      config.model = config.get_model(a.args)
+      return
+    end
+    vim.ui.select(config.all_models(), {
+      prompt = 'Select model',
+      format_item = function(model)
+        return model.name
+      end,
+    }, function(model)
+      config.model = model
+    end)
   end, {
     nargs = '*',
     complete = config.model_names,
