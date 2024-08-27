@@ -14,7 +14,7 @@ syntax region assistantContent start=/^<🤖\?assistant>$/ end=/^\.$/ contains=a
 syntax match waitingTag /<WAITING>/
 
 highlight link userTag Title
-highlight link userContent Comment
+highlight link userContent Normal
 
 highlight link systemTag userTag
 highlight link systemContent userContent
@@ -24,8 +24,8 @@ highlight link assistantContent userContent
 
 highlight link waitingTag WarningMsg
 
-" function! s:show()
-"     let l:syntaxgroup = synIDattr(synID(line('.'), col('.'), 1), 'name')
-"     echomsg l:syntaxgroup
-" endfunction
-" nnoremap . :call <SID>show()<CR>
+function! s:show()
+    let l:syntaxgroup = synIDattr(synID(line('.'), col('.'), 1), 'name')
+    echomsg l:syntaxgroup
+endfunction
+nnoremap . :call <SID>show()<CR>
