@@ -32,17 +32,18 @@ function M.setup(opts)
     callback = event.on_vim_leave_pre,
   })
 
-  vim.api.nvim_create_user_command(
-    'NyaiChat',
-    command.chat,
-    { nargs = '*', complete = require('nyai.completion').complete_templates, range = true, bang = true }
-  )
+  vim.api.nvim_create_user_command('NyaiChat', command.chat, {
+    nargs = '*',
+    complete = require('nyai.completion').complete_templates,
+    range = true,
+    bang = true,
+    bar = true,
+  })
 
   vim.api.nvim_create_user_command('NyaiModel', command.model, {
     nargs = '*',
     complete = config.model_names,
-    range = true,
-    bang = true,
+    bar = true,
   })
 end
 
