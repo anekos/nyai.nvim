@@ -1,15 +1,41 @@
 local action = require('nyai.action')
+local buffer = require('nyai.buffer')
 local config = require('nyai.config')
 
 local M = {}
 
+M.last_buffer = nil
+
 function M.chat(a)
   if #a.args == 0 then
-    local fname = vim.fn.strftime('~/nyai/%Y%m%d-%H%M.nyai')
-    vim.cmd.edit(fname)
+    vim.cmd.edit(buffer.new_filename())
   else
     action.run_with_template(a.args, a.bang)
   end
+end
+
+function M.float(opts)
+  local new_buffer = opts.bang or M.last_buffer == nil
+
+  local fname = buffer.new_filename()
+
+  local buf
+  if new_buffer then
+    buf = vim.api.nvim_create_buf(true, false)
+    M.last_buffer = buf
+  else
+    buf = M.last_buffer
+  end
+
+  local win = vim.api.nvim_open_win(buf, true, config.float_options())
+  vim.api.nvim_win_set_option(win, 'winblend', 20)
+
+  if new_buffer then
+    buffer.initialize(buf, fname)
+    vim.fn.cursor(2, 0)
+  end
+
+  vim.cmd.startinsert()
 end
 
 function M.model(a)
@@ -26,4 +52,5 @@ function M.model(a)
     config.model = model
   end)
 end
+
 return M

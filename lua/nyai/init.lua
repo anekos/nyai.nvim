@@ -15,6 +15,7 @@ function M.setup(opts)
   apply('model')
   apply('api_end_point')
   apply('api_key')
+  apply('float_options')
 
   persistent.load_state()
 
@@ -36,6 +37,12 @@ function M.setup(opts)
     nargs = '*',
     complete = require('nyai.completion').complete_templates,
     range = true,
+    bang = true,
+    bar = true,
+  })
+
+  vim.api.nvim_create_user_command('NyaiFloat', command.float, {
+    nargs = '*',
     bang = true,
     bar = true,
   })

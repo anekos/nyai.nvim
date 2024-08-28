@@ -67,4 +67,27 @@ function M.get_parameters()
   return parameters
 end
 
+function M.initialize(buf, fname)
+  local lines = { '<user>', '' }
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+
+  if not fname then
+    fname = config.new_filename()
+  end
+  vim.api.nvim_buf_set_name(buf, fname)
+
+  vim.api.nvim_buf_set_option(buf, 'filetype', 'nyai')
+  vim.api.nvim_buf_set_option(buf, 'modified', false)
+end
+
+function M.new_filename()
+  local result =  config.directory .. '/' .. vim.fn.strftime('~/nyai/%Y%m%d-%H%M.nyai')
+  local no = 0
+  while 0 <= vim.fn.bufnr(result) do
+    no = no + 1
+    result = vim.fn.substitute(result, [[\.nyai$]], '-' .. no .. '.nyai', '')
+  end
+  return result
+end
+
 return M
