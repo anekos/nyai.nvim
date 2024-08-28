@@ -85,6 +85,11 @@ function M.initialize(buf, fname, float)
   vim.api.nvim_buf_set_option(buf, 'modified', false)
 end
 
+function M.ready_to_edit()
+  vim.fn.cursor(2, 0)
+  vim.cmd.startinsert()
+end
+
 function M.new_filename()
   local result =  config.directory .. vim.fn.strftime('/%Y%m%d-%H%M.nyai')
   local no = 0

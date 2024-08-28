@@ -11,8 +11,7 @@ function M.chat(a)
     vim.cmd.edit(buffer.new_filename())
     local buf = vim.api.nvim_get_current_buf()
     buffer.initialize(buf, buffer.new_filename(), false)
-    vim.fn.cursor(2, 0)
-    vim.cmd.startinsert()
+    buffer.ready_to_edit()
   else
     action.run_with_template(a.args, a.bang)
   end
@@ -36,7 +35,8 @@ function M.float(opts)
 
   if new_buffer then
     buffer.initialize(buf, fname, true)
-    vim.fn.cursor(2, 0)
+    buffer.ready_to_edit()
+    return
   end
 
   vim.cmd.startinsert()
