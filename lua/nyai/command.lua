@@ -9,6 +9,10 @@ M.last_buffer = nil
 function M.chat(a)
   if #a.args == 0 then
     vim.cmd.edit(buffer.new_filename())
+    local buf = vim.api.nvim_get_current_buf()
+    buffer.initialize(buf, buffer.new_filename(), false)
+    vim.fn.cursor(2, 0)
+    vim.cmd.startinsert()
   else
     action.run_with_template(a.args, a.bang)
   end
@@ -31,7 +35,7 @@ function M.float(opts)
   vim.api.nvim_win_set_option(win, 'winblend', 20)
 
   if new_buffer then
-    buffer.initialize(buf, fname)
+    buffer.initialize(buf, fname, true)
     vim.fn.cursor(2, 0)
   end
 
