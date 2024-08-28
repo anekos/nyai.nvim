@@ -87,7 +87,7 @@ function M.run_with_template(name, replace)
     table.insert(lines, '')
     table.insert(lines, '<user>')
 
-    util.new_buffew_with(lines)
+    util.new_buffer_with(lines)
 
     vim.bo.filetype = 'nyai'
   end

@@ -17,7 +17,7 @@ function M.buffer_text()
   return vim.fn.join(vim.api.nvim_buf_get_lines(current_buffer, 0, -1, false), '\n')
 end
 
-function M.new_buffew_with(lines)
+function M.new_buffer_with(lines)
   vim.cmd.tabnew()
   local buf = vim.api.nvim_create_buf(false, true)
   vim.api.nvim_win_set_buf(0, buf)
