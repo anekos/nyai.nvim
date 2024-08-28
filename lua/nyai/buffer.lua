@@ -67,7 +67,7 @@ function M.get_parameters()
   return parameters
 end
 
-function M.initialize(buf, fname)
+function M.initialize(buf, fname, float)
   local lines = { '<user>', '' }
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 
@@ -75,6 +75,11 @@ function M.initialize(buf, fname)
     fname = config.new_filename()
   end
   vim.api.nvim_buf_set_name(buf, fname)
+
+  if float then
+    vim.api.nvim_buf_set_keymap(buf, 'n', 'q', '<Cmd>wincmd c<CR>', { noremap = true })
+    vim.api.nvim_buf_set_keymap(buf, 'n', '<Esc>', '<Cmd>wincmd c<CR>', { noremap = true })
+  end
 
   vim.api.nvim_buf_set_option(buf, 'filetype', 'nyai')
   vim.api.nvim_buf_set_option(buf, 'modified', false)
