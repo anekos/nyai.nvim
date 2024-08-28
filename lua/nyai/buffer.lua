@@ -81,7 +81,7 @@ function M.initialize(buf, fname)
 end
 
 function M.new_filename()
-  local result =  config.directory .. '/' .. vim.fn.strftime('~/nyai/%Y%m%d-%H%M.nyai')
+  local result =  config.directory .. vim.fn.strftime('/%Y%m%d-%H%M.nyai')
   local no = 0
   while 0 <= vim.fn.bufnr(result) do
     no = no + 1
