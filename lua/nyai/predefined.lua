@@ -6,6 +6,8 @@ M.OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions'
 -- https://docs.perplexity.ai/reference/post_chat_completions
 M.PERPLEXITY_ENDPOINT = 'https://api.perplexity.ai/chat/completions'
 
+M.GITHUB_COPILOT_ENDPOINT = 'https://api.githubcopilot.com/chat/completions'
+
 M.models = {
   {
     name = 'OpenAI - GPT 4o',
@@ -72,6 +74,12 @@ M.models = {
     id = 'mixtral-8x7b-instruct',
     api_endpoint = M.PERPLEXITY_ENDPOINT,
     api_key = vim.env.PERPLEXITY_API_KEY,
+  },
+  {
+    name = 'Github - Copilot',
+    id = nil,
+    api_endpoint = M.GITHUB_COPILOT_ENDPOINT,
+    api_key = vim.env.GITHUB_TOKEN,
   },
 }
 
