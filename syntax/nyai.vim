@@ -23,9 +23,3 @@ highlight link assistantTag userTag
 highlight link assistantContent userContent
 
 highlight link waitingTag WarningMsg
-
-function! s:show()
-    let l:syntaxgroup = synIDattr(synID(line('.'), col('.'), 1), 'name')
-    echomsg l:syntaxgroup
-endfunction
-nnoremap . :call <SID>show()<CR>
