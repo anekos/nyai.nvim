@@ -7,8 +7,8 @@ local M = {
     local columns = vim.api.nvim_get_option('columns')
     local lines = vim.api.nvim_get_option('lines')
 
-    local width = math.max(columns / 3, 70)
-    local height = math.max(lines / 3, 30)
+    local width = math.floor(math.max(columns / 3, 70))
+    local height = math.floor(math.max(lines / 3, 30))
 
     return {
       style = 'minimal',
