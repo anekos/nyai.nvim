@@ -11,6 +11,10 @@ function M.run(context)
   local current_win = vim.api.nvim_get_current_win()
 
   local on_resp = function(body)
+    if '... WAITING ...' == vim.fn.getline(context.insert_to + 1) then
+      vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to + 1, false, {})
+    end
+
     local lines = { '# assistant', '' }
 
     if context.at_last then
@@ -41,6 +45,8 @@ function M.run(context)
 
     vim.cmd.startinsert()
   end
+
+  vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to, false, { '... WAITING ...' })
 
   api.chat_completions(context.parameters, function(body)
     vim.schedule(function()
