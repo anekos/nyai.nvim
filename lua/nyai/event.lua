@@ -1,27 +1,17 @@
-local persistent = require('nyai.persistent')
 local action = require('nyai.action')
-local vutil = require('nyai.util')
+local buffer = require('nyai.buffer')
+local persistent = require('nyai.persistent')
 
 local M = {}
 
-function M.on_cr()
-  vim.keymap.set('i', '<CR>', function()
-    if vim.fn.getline('.') == '.' then
+function M.on_filetype()
+  vim.keymap.set({ 'n', 'i' }, '<C-CR>', function()
+    local context = buffer.get_context()
+    if context ~= nil then
       vim.schedule(function()
-        action.run()
+        action.run(context)
       end)
-    else
-      vutil.feedkeys('<CR>')
     end
-  end, { buffer = true })
-
-  vim.keymap.set('i', '<C-CR>', function()
-    if vim.fn.getline('.') ~= '.' then
-      vutil.feedkeys('<CR>.')
-    end
-    vim.schedule(function()
-      action.run()
-    end)
   end, { buffer = true })
 end
 

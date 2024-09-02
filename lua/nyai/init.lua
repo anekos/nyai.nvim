@@ -24,7 +24,7 @@ function M.setup(opts)
   vim.api.nvim_create_autocmd({ 'FileType' }, {
     group = group,
     pattern = 'nyai',
-    callback = event.on_cr,
+    callback = event.on_filetype,
   })
 
   vim.api.nvim_create_autocmd({ 'VimLeavePre' }, {
