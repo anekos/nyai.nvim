@@ -14,15 +14,23 @@ local extract_role = function(line)
   end
 end
 
--- local try_to_set_parameters = function(line, parameters)
---   -- get key value from `foo = bar`
---   local key, value = string.match(line, '(%w+) = (.+)')
---   if key == nil or value == nil then
---     return
---   end
---   print('Set key: ' .. key .. ' to value: ' .. value)
---   parameters[key] = value
--- end
+local try_to_set_parameters = function(line, parameters, overwrite)
+  -- `@foo = bar`
+
+  local key, value = string.match(line, '@(%w+)%s*=%s*(.+)')
+  if key == nil or value == nil then
+    return
+  end
+
+  value = vim.trim(value)
+
+  if vim.tbl_contains({ 'model' }, key) then
+    if not overwrite and parameters[key] then
+      return
+    end
+    parameters[key] = value
+  end
+end
 
 local function get_syntax_name(line, col)
   local current_syn_id = vim.fn.synID(line, col, 1)
@@ -53,21 +61,31 @@ local function extract_valid_line(start_line, end_line)
   return vim.list_slice(lines, start_blank_lines + 1, #lines - end_blank_lines)
 end
 
-local function is_heading(line)
-  local syntax_name = get_syntax_name(line, 1)
+local function is_heading(syntax_name)
   if vim.tbl_contains({ 'markdownH1Delimiter' }, syntax_name) then
     return true
   end
 end
 
-function M.current_sections()
+local function is_comment(syntax_name)
+  if vim.tbl_contains({ 'Comment' }, syntax_name) then
+    return true
+  end
+end
+
+function M.get_context()
   local end_line = nil
   local sections = {}
   local current_line_number = vim.fn.line('.')
+  local result = { messages = {} }
 
   for ln = current_line_number + 1, vim.fn.line('$'), 1 do
-    if is_heading(ln) then
-      local line = vim.fn.getline(ln)
+    local syntax_name = get_syntax_name(ln, 1)
+    local line = vim.fn.getline(ln)
+
+    if is_comment(syntax_name) then
+      try_to_set_parameters(line, result, true)
+    elseif is_heading(syntax_name) then
       if extract_role(line) then
         end_line = ln - 1
         break
@@ -80,8 +98,12 @@ function M.current_sections()
   end
 
   for ln = end_line, 1, -1 do
-    if is_heading(ln) then
-      local line = vim.fn.getline(ln)
+    local syntax_name = get_syntax_name(ln, 1)
+    local line = vim.fn.getline(ln)
+
+    if is_comment(syntax_name) then
+      try_to_set_parameters(line, result, false)
+    elseif is_heading(syntax_name) then
       local line_role = extract_role(line)
       if line_role ~= nil then
         table.insert(sections, 1, {
@@ -95,31 +117,22 @@ function M.current_sections()
     end
   end
 
-  return sections
-end
-
-function M.get_context()
-  -- TODO Use try_to_set_parameters
-
-  local sections = M.current_sections()
   if not sections or #sections < 1 or sections[#sections].role ~= 'user' then
     return nil
   end
 
-  local messages = {}
-
   for _, section in ipairs(sections) do
-    table.insert(messages, { role = section.role, content = vim.fn.join(section.lines) })
+    table.insert(result.messages, { role = section.role, content = vim.fn.join(section.lines) })
   end
 
-  return {
-    insert_to = sections[#sections].end_line,
-    at_last = sections[#sections].end_line == vim.fn.line('$'),
-    parameters = {
-      model = config.model.id,
-      messages = messages,
-    },
-  }
+  result.insert_to = sections[#sections].end_line
+  result.at_last = sections[#sections].end_line == vim.fn.line('$')
+
+  if not result.model then
+    result.model = config.model.id
+  end
+
+  return result
 end
 
 function M.initialize(buf, fname, float)
