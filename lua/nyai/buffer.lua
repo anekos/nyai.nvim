@@ -127,7 +127,7 @@ function M.initialize(buf, fname, float)
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 
   if not fname then
-    fname = config.new_filename()
+    fname = M.new_filename()
   end
   vim.api.nvim_buf_set_name(buf, fname)
 
