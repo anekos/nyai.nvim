@@ -1,4 +1,5 @@
 local config = require('nyai.config')
+local kind = require('cmp.types.lsp').CompletionItemKind
 
 local M = {}
 
@@ -29,6 +30,7 @@ function M:complete(params, callback)
       items = vim.tbl_map(function(name)
         return {
           label = name,
+          kind = kind.Value,
         }
       end, model_names),
     }
@@ -38,7 +40,7 @@ function M:complete(params, callback)
   if ctx.cursor_before_line:match('^@') then
     callback {
       items = {
-        { label = '@model' },
+        { label = '@model', kind = kind.Property },
       },
     }
     return
