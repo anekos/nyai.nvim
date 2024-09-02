@@ -80,6 +80,7 @@ function M.run_with_template(name, replace)
     table.insert(lines, '.')
     table.insert(lines, '')
     table.insert(lines, '# assistant')
+    table.insert(lines, '')
 
     for _, line in ipairs(anwser) do -- FIXME ?
       table.insert(lines, line)
@@ -87,6 +88,7 @@ function M.run_with_template(name, replace)
 
     table.insert(lines, '')
     table.insert(lines, '# user')
+    table.insert(lines, '')
 
     util.new_buffer_with(lines)
 
