@@ -13,6 +13,7 @@ function M.setup(opts)
   end
 
   apply('model')
+  apply('user_models')
   apply('api_end_point')
   apply('api_key')
   apply('float_options')

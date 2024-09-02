@@ -21,7 +21,7 @@ function M.run(context)
       table.insert(lines, 1, '')
     end
 
-    for _, line in ipairs(vim.split(body.choices[1].message.content, '\n')) do -- FIXME ?
+    for _, line in ipairs(vim.split(body, '\n')) do -- FIXME ?
       table.insert(lines, line)
     end
 
@@ -48,11 +48,7 @@ function M.run(context)
 
   vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to, false, { '... WAITING ...' })
 
-  api.chat_completions(context.parameters, function(body)
-    vim.schedule(function()
-      on_resp(vim.fn.json_decode(body))
-    end)
-  end)
+  api.chat_completions(context.parameters, on_resp)
 end
 
 function M.run_with_template(name, replace)
@@ -71,7 +67,7 @@ function M.run_with_template(name, replace)
   local on_resp = function(body)
     local anwser = {}
 
-    for _, line in ipairs(vim.split(body.choices[1].message.content, '\n')) do -- FIXME ?
+    for _, line in ipairs(vim.split(body, '\n')) do -- FIXME ?
       table.insert(anwser, line)
     end
 
@@ -103,11 +99,7 @@ function M.run_with_template(name, replace)
     vim.bo.filetype = 'nyai'
   end
 
-  api.chat_completions(parameters, function(body)
-    vim.schedule(function()
-      on_resp(vim.fn.json_decode(body))
-    end)
-  end)
+  api.chat_completions(parameters, on_resp)
 end
 
 return M
