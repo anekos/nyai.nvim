@@ -73,18 +73,18 @@ local function is_comment(syntax_name)
   end
 end
 
-function M.get_context()
+local function read_buffer()
   local end_line = nil
-  local sections = {}
   local current_line_number = vim.fn.line('.')
-  local result = { messages = {} }
+  local sections = {}
+  local parameters = {}
 
   for ln = current_line_number + 1, vim.fn.line('$'), 1 do
     local syntax_name = get_syntax_name(ln, 1)
     local line = vim.fn.getline(ln)
 
     if is_comment(syntax_name) then
-      try_to_set_parameters(line, result, true)
+      try_to_set_parameters(line, parameters, true)
     elseif is_heading(syntax_name) then
       if extract_role(line) then
         end_line = ln - 1
@@ -102,7 +102,7 @@ function M.get_context()
     local line = vim.fn.getline(ln)
 
     if is_comment(syntax_name) then
-      try_to_set_parameters(line, result, false)
+      try_to_set_parameters(line, parameters, false)
     elseif is_heading(syntax_name) then
       local line_role = extract_role(line)
       if line_role ~= nil then
@@ -117,20 +117,32 @@ function M.get_context()
     end
   end
 
+  return sections, parameters
+end
+
+function M.get_context()
+  local result = {}
+  local messages = {}
+
+  local sections, parameters = read_buffer()
+
   if not sections or #sections < 1 or sections[#sections].role ~= 'user' then
     return nil
   end
 
   for _, section in ipairs(sections) do
-    table.insert(result.messages, { role = section.role, content = vim.fn.join(section.lines) })
+    table.insert(messages, { role = section.role, content = vim.fn.join(section.lines) })
   end
 
   result.insert_to = sections[#sections].end_line
   result.at_last = sections[#sections].end_line == vim.fn.line('$')
 
-  if not result.model then
-    result.model = config.model.id
+  if not parameters.model then
+    parameters.model = config.model.id
   end
+
+  parameters.messages = messages
+  result.parameters = parameters
 
   return result
 end
