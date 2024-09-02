@@ -4,7 +4,6 @@ local config = require('nyai.config')
 local M = {}
 
 function M.chat_completions(parameters, callback)
-  vim.print('chat_completions', parameters)
   curl.request {
     method = 'POST',
     url = config.model.api_endpoint,

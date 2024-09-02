@@ -7,7 +7,6 @@ local M = {}
 local dir = vim.fn.expand('~/.config/nvim/nyai')
 
 function M.run(context)
-  vim.print('run', context)
   local current_buffer = vim.api.nvim_get_current_buf()
   local current_win = vim.api.nvim_get_current_win()
 
@@ -31,7 +30,6 @@ function M.run(context)
       table.insert(lines, '')
     end
 
-    vim.print('lines', lines)
     vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to, false, lines)
 
     if context.at_last then
