@@ -35,8 +35,7 @@ function M.setup(opts)
   })
 
   vim.api.nvim_create_user_command('NyaiChat', command.chat, {
-    nargs = '*',
-    complete = require('nyai.completion').complete_templates,
+    nargs = 0,
     range = true,
     bang = true,
     bar = true,

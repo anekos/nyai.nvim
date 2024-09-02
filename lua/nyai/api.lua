@@ -1,26 +1,28 @@
 local curl = require('plenary.curl')
-local config = require('nyai.config')
 
 local M = {}
 
-function M.chat_completions(parameters, callback)
-  parameters = vim.deepcopy(parameters)
+function M.chat_completions(request, callback)
+  -- request = { parameters, model }
+
+  local params = vim.deepcopy(request.parameters)
 
   local headers = {
     content_type = 'application/json',
   }
 
-  if config.model.api_key then
-    headers['Authorization'] = 'Bearer ' .. config.model.api_key
+  if request.model.api_key then
+    headers['Authorization'] = 'Bearer ' .. request.model.api_key
   end
 
-  parameters.stream = false
+  params.stream = false
+  params.model = request.model.id
 
   curl.request {
     method = 'POST',
-    url = config.model.api_endpoint,
+    url = request.model.api_endpoint,
     headers = headers,
-    body = vim.fn.json_encode(parameters),
+    body = vim.fn.json_encode(params),
     timeout = 60 * 1000,
     callback = function(resp)
       if resp.status ~= 200 then

@@ -1,14 +1,32 @@
 local api = require('nyai.api')
 local config = require('nyai.config')
-local util = require('nyai.util')
 
 local M = {}
 
-local dir = vim.fn.expand('~/.config/nvim/nyai')
+local function from_context(ctx)
+  local request = { model = config.model, parameters = {} }
+
+  for key, value in pairs(ctx.parameters) do
+    if key == 'model' then
+      local got = config.get_model(value)
+      if got == nil then
+        error('Model not found: ' .. value)
+      end
+      request.model = got
+    else
+      request.parameters[key] = value
+    end
+  end
+
+  request.parameters.messages = ctx.messages
+
+  return request
+end
 
 function M.run(context)
   local current_buffer = vim.api.nvim_get_current_buf()
   local current_win = vim.api.nvim_get_current_win()
+  local request = from_context(context)
 
   local on_resp = function(body)
     if '... WAITING ...' == vim.fn.getline(context.insert_to + 1) then
@@ -47,59 +65,9 @@ function M.run(context)
   end
 
   vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to, false, { '... WAITING ...' })
+  vim.cmd.stopinsert()
 
-  api.chat_completions(context.parameters, on_resp)
-end
-
-function M.run_with_template(name, replace)
-  local file_path = dir .. '/' .. name .. '.nyai'
-  local content = vim.fn.join(vim.fn.readfile(file_path), '\n')
-  local embedded = string.gsub(content, '{{_select_}}', util.selected_text())
-  embedded = string.gsub(embedded, '{{_buffer_}}', util.buffer_text())
-
-  local parameters = {
-    model = config.model.id,
-    messages = {
-      { role = 'user', content = embedded },
-    },
-  }
-
-  local on_resp = function(body)
-    local anwser = {}
-
-    for _, line in ipairs(vim.split(body, '\n')) do -- FIXME ?
-      table.insert(anwser, line)
-    end
-
-    if replace then
-      util.replace_selection(vim.fn.join(anwser, '\n'))
-      return
-    end
-
-    local lines = { '# user' }
-
-    for _, line in ipairs(vim.split(embedded, '\n')) do
-      table.insert(lines, line)
-    end
-
-    table.insert(lines, '')
-    table.insert(lines, '# assistant')
-    table.insert(lines, '')
-
-    for _, line in ipairs(anwser) do -- FIXME ?
-      table.insert(lines, line)
-    end
-
-    table.insert(lines, '')
-    table.insert(lines, '# user')
-    table.insert(lines, '')
-
-    util.new_buffer_with(lines)
-
-    vim.bo.filetype = 'nyai'
-  end
-
-  api.chat_completions(parameters, on_resp)
+  api.chat_completions(request, on_resp)
 end
 
 return M

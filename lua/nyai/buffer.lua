@@ -121,6 +121,8 @@ local function read_buffer()
 end
 
 function M.get_context()
+  -- returns { insert_to, at_last, parameters, messages }
+
   local result = {}
   local messages = {}
 
@@ -137,12 +139,8 @@ function M.get_context()
   result.insert_to = sections[#sections].end_line
   result.at_last = sections[#sections].end_line == vim.fn.line('$')
 
-  if not parameters.model then
-    parameters.model = config.model.id
-  end
-
-  parameters.messages = messages
   result.parameters = parameters
+  result.messages = messages
 
   return result
 end

@@ -1,4 +1,3 @@
-local action = require('nyai.action')
 local buffer = require('nyai.buffer')
 local config = require('nyai.config')
 
@@ -7,14 +6,10 @@ local M = {}
 M.last_buffer = nil
 
 function M.chat(a)
-  if #a.args == 0 then
-    vim.cmd.edit(buffer.new_filename())
-    local buf = vim.api.nvim_get_current_buf()
-    buffer.initialize(buf, buffer.new_filename(), false)
-    buffer.ready_to_edit()
-  else
-    action.run_with_template(a.args, a.bang)
-  end
+  vim.cmd.edit(buffer.new_filename())
+  local buf = vim.api.nvim_get_current_buf()
+  buffer.initialize(buf, buffer.new_filename(), false)
+  buffer.ready_to_edit()
 end
 
 function M.float(opts)
