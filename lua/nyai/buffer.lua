@@ -3,72 +3,127 @@ local config = require('nyai.config')
 local M = {}
 
 local extract_role = function(line)
-  if line == '<user>' then
+  if line == '# user' then
     return 'user'
-  elseif line == '<assistant>' then
+  elseif line == '# assistant' then
     return 'assistant'
-  elseif line == '<system>' then
+  elseif line == '# system' then
     return 'system'
   else
     return nil
   end
 end
 
-local try_to_set_parameters = function(line, parameters)
-  -- get key value from `foo = bar`
-  local key, value = string.match(line, '(%w+) = (.+)')
-  if key == nil or value == nil then
-    return
-  end
-  print('Set key: ' .. key .. ' to value: ' .. value)
-  parameters[key] = value
+-- local try_to_set_parameters = function(line, parameters)
+--   -- get key value from `foo = bar`
+--   local key, value = string.match(line, '(%w+) = (.+)')
+--   if key == nil or value == nil then
+--     return
+--   end
+--   print('Set key: ' .. key .. ' to value: ' .. value)
+--   parameters[key] = value
+-- end
+
+local function get_syntax_name(line, col)
+  local current_syn_id = vim.fn.synID(line, col, 1)
+  return vim.fn.synIDattr(current_syn_id, 'name')
 end
 
-function M.get_parameters()
-  local lines = vim.fn.getline(1, '$')
-  local parameters = {
-    model = config.model.id,
-  }
-  local messages = {}
-  local current = nil
+local function extract_valid_line(start_line, end_line)
+  local lines = vim.fn.getline(start_line, end_line)
+  local start_blank_lines = 0
+  local end_blank_lines = 0
 
   for _, line in ipairs(lines) do
-    if current == nil then
-      local role = extract_role(line)
+    if line == '' then
+      start_blank_lines = start_blank_lines + 1
+    else
+      break
+    end
+  end
 
-      if role == nil then
-        try_to_set_parameters(line, parameters)
-      else
-        current = { role = role, content = {} }
+  for i = #lines, 1, -1 do
+    if lines[i] == '' then
+      end_blank_lines = end_blank_lines + 1
+    else
+      break
+    end
+  end
+
+  return vim.list_slice(lines, start_blank_lines + 1, #lines - end_blank_lines)
+end
+
+local function is_heading(line)
+  local syntax_name = get_syntax_name(line, 1)
+  if vim.tbl_contains({ 'markdownH1Delimiter' }, syntax_name) then
+    return true
+  end
+end
+
+function M.current_sections()
+  local end_line = nil
+  local sections = {}
+  local current_line_number = vim.fn.line('.')
+
+  for ln = current_line_number + 1, vim.fn.line('$'), 1 do
+    if is_heading(ln) then
+      local line = vim.fn.getline(ln)
+      if extract_role(line) then
+        end_line = ln - 1
+        break
       end
-
-      goto continue
     end
-
-    if line == '.' then
-      table.insert(messages, current)
-      current = nil
-      goto continue
-    end
-
-    if current ~= nil and current.content ~= nil then
-      table.insert(current.content, line)
-    end
-
-    ::continue::
   end
 
-  for _, message in ipairs(messages) do
-    message.content = vim.fn.join(message.content, '\n')
+  if end_line == nil then
+    end_line = vim.fn.line('$')
   end
 
-  parameters.messages = messages
+  for ln = end_line, 1, -1 do
+    if is_heading(ln) then
+      local line = vim.fn.getline(ln)
+      local line_role = extract_role(line)
+      if line_role ~= nil then
+        table.insert(sections, 1, {
+          start_line = ln,
+          end_line = end_line,
+          role = line_role,
+          lines = extract_valid_line(ln + 1, end_line),
+        })
+        end_line = ln - 1
+      end
+    end
+  end
 
-  return parameters
+  return sections
+end
+
+function M.get_context()
+  -- TODO Use try_to_set_parameters
+
+  local sections = M.current_sections()
+  if not sections or #sections < 1 or sections[#sections].role ~= 'user' then
+    return nil
+  end
+
+  local messages = {}
+
+  for _, section in ipairs(sections) do
+    table.insert(messages, { role = section.role, content = vim.fn.join(section.lines) })
+  end
+
+  return {
+    insert_to = sections[#sections].end_line,
+    at_last = sections[#sections].end_line == vim.fn.line('$'),
+    parameters = {
+      model = config.model.id,
+      messages = messages,
+    },
+  }
 end
 
 function M.initialize(buf, fname, float)
-  local lines = { '<user>', '' }
+  local lines = { '# user', '', '' }
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 
   if not fname then
@@ -86,7 +141,7 @@ function M.initialize(buf, fname, float)
 end
 
 function M.ready_to_edit()
-  vim.fn.cursor(2, 0)
+  vim.fn.cursor(3, 0)
   vim.cmd.startinsert()
 end
 

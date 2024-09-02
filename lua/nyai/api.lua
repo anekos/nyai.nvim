@@ -14,7 +14,6 @@ function M.chat_completions(parameters, callback)
     body = vim.fn.json_encode(parameters),
     timeout = 60 * 1000,
     callback = function(resp)
-      print(vim.inspect(resp.body))
       callback(resp.body)
     end,
   }

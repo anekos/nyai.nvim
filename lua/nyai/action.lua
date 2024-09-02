@@ -1,44 +1,54 @@
-local config = require('nyai.config')
 local api = require('nyai.api')
-local buffer = require('nyai.buffer')
+local config = require('nyai.config')
 local util = require('nyai.util')
 
 local M = {}
 
 local dir = vim.fn.expand('~/.config/nvim/nyai')
 
-function M.run()
+function M.run(context)
   local current_buffer = vim.api.nvim_get_current_buf()
   local current_win = vim.api.nvim_get_current_win()
-  local parameters = buffer.get_parameters()
 
   local on_resp = function(body)
-    local lines = { '<assistant>' }
+    if '... WAITING ...' == vim.fn.getline(context.insert_to + 1) then
+      vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to + 1, false, {})
+    end
 
-    local last_line = vim.fn.getline('$')
-    if last_line == '<WAITING>' then
-      -- Remove last line
-      vim.api.nvim_buf_set_lines(current_buffer, -2, -1, true, {})
+    local lines = { '# assistant', '' }
+
+    if context.at_last then
+      table.insert(lines, 1, '')
     end
 
     for _, line in ipairs(vim.split(body.choices[1].message.content, '\n')) do -- FIXME ?
       table.insert(lines, line)
     end
 
-    table.insert(lines, '.')
     table.insert(lines, '')
-    table.insert(lines, '<user>')
+    table.insert(lines, '# user')
+    table.insert(lines, '')
     table.insert(lines, '')
 
-    vim.api.nvim_buf_set_lines(current_buffer, -1, -1, true, lines)
+    if not context.at_last then
+      table.insert(lines, '')
+    end
 
-    local num_lines = vim.api.nvim_buf_line_count(current_buffer)
-    vim.api.nvim_win_set_cursor(current_win, { num_lines, 0 })
+    vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to, false, lines)
+
+    if context.at_last then
+      local num_lines = vim.api.nvim_buf_line_count(current_buffer)
+      vim.api.nvim_win_set_cursor(current_win, { num_lines, 0 })
+    else
+      vim.api.nvim_win_set_cursor(current_win, { #lines + context.insert_to - 1, 0 })
+    end
+
+    vim.cmd.startinsert()
   end
 
-  vim.api.nvim_buf_set_lines(current_buffer, -1, -1, true, { '', '<WAITING>' })
+  vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to, false, { '... WAITING ...' })
 
-  api.chat_completions(parameters, function(body)
+  api.chat_completions(context.parameters, function(body)
     vim.schedule(function()
       on_resp(vim.fn.json_decode(body))
     end)
@@ -70,22 +80,23 @@ function M.run_with_template(name, replace)
       return
     end
 
-    local lines = { '<user>' }
+    local lines = { '# user' }
 
     for _, line in ipairs(vim.split(embedded, '\n')) do
       table.insert(lines, line)
     end
 
-    table.insert(lines, '.')
     table.insert(lines, '')
-    table.insert(lines, '<assistant>')
+    table.insert(lines, '# assistant')
+    table.insert(lines, '')
 
     for _, line in ipairs(anwser) do -- FIXME ?
       table.insert(lines, line)
     end
 
     table.insert(lines, '')
-    table.insert(lines, '<user>')
+    table.insert(lines, '# user')
+    table.insert(lines, '')
 
     util.new_buffer_with(lines)
 
