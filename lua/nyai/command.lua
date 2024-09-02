@@ -53,7 +53,9 @@ function M.model(a)
       return model.name
     end,
   }, function(model)
-    config.model = model
+    if model then
+      config.model = model
+    end
   end)
 end
 

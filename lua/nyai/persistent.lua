@@ -27,7 +27,10 @@ function M.load_state()
   local state = vim.fn.json_decode(content)
   file:close()
 
-  config.model = config.get_model(state.model_name)
+  local ok, loaded_model = pcall(config.get_model, state.model_name)
+  if ok then
+    config.model = loaded_model
+  end
 end
 
 return M
