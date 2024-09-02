@@ -3,11 +3,11 @@ local config = require('nyai.config')
 local M = {}
 
 local extract_role = function(line)
-  if line == '<user>' then
+  if line == '# user' then
     return 'user'
-  elseif line == '<assistant>' then
+  elseif line == '# assistant' then
     return 'assistant'
-  elseif line == '<system>' then
+  elseif line == '# system' then
     return 'system'
   else
     return nil
@@ -68,7 +68,7 @@ function M.get_parameters()
 end
 
 function M.initialize(buf, fname, float)
-  local lines = { '<user>', '' }
+  local lines = { '# user', '', '' }
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 
   if not fname then
@@ -86,7 +86,7 @@ function M.initialize(buf, fname, float)
 end
 
 function M.ready_to_edit()
-  vim.fn.cursor(2, 0)
+  vim.fn.cursor(3, 0)
   vim.cmd.startinsert()
 end
 

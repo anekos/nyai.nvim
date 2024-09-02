@@ -13,7 +13,7 @@ function M.run()
   local parameters = buffer.get_parameters()
 
   local on_resp = function(body)
-    local lines = { '<assistant>' }
+    local lines = { '# assistant' }
 
     local last_line = vim.fn.getline('$')
     if last_line == '<WAITING>' then
@@ -27,7 +27,8 @@ function M.run()
 
     table.insert(lines, '.')
     table.insert(lines, '')
-    table.insert(lines, '<user>')
+    table.insert(lines, '# user')
+    table.insert(lines, '')
     table.insert(lines, '')
 
     vim.api.nvim_buf_set_lines(current_buffer, -1, -1, true, lines)
@@ -70,7 +71,7 @@ function M.run_with_template(name, replace)
       return
     end
 
-    local lines = { '<user>' }
+    local lines = { '# user' }
 
     for _, line in ipairs(vim.split(embedded, '\n')) do
       table.insert(lines, line)
@@ -78,14 +79,14 @@ function M.run_with_template(name, replace)
 
     table.insert(lines, '.')
     table.insert(lines, '')
-    table.insert(lines, '<assistant>')
+    table.insert(lines, '# assistant')
 
     for _, line in ipairs(anwser) do -- FIXME ?
       table.insert(lines, line)
     end
 
     table.insert(lines, '')
-    table.insert(lines, '<user>')
+    table.insert(lines, '# user')
 
     util.new_buffer_with(lines)
 
