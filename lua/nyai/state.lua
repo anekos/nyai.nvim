@@ -1,7 +1,7 @@
 local predefined = require('nyai.predefined')
 local config = require('nyai.config')
 
-local M = {}
+local M = { values = {} }
 
 function M.all_models()
   local models = {}
@@ -14,14 +14,17 @@ function M.all_models()
   return models
 end
 
-function M.get_model(name)
+function M.get_model(name_or_id)
   for _, model in ipairs(M.all_models()) do
-    if model.name == name then
+    if model.id == name_or_id then
+      return model
+    end
+    if model.name == name_or_id then
       return model
     end
   end
 
-  error('Model not found: ' .. name)
+  error('Model not found: ' .. name_or_id)
 end
 
 function M.model_names()
@@ -30,14 +33,24 @@ function M.model_names()
   end, M.all_models())
 end
 
-function M.set_model(name)
-  local model = M.get_model(name)
+function M.model_ids()
+  return vim.tbl_map(function(model)
+    return model.id
+  end, M.all_models())
+end
+
+function M.set_model(name_or_id)
+  local model = M.get_model(name_or_id)
   if model == nil then
-    error('Model not found: ' .. name)
+    error('Model not found: ' .. name_or_id)
   end
   M.model = model
 end
 
-M.model = M.all_models()[1]
+function M.current_model()
+  return M.get_model(M.values.model_id)
+end
+
+M.model_id = M.all_models()[1].id
 
 return M
