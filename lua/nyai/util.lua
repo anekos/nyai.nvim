@@ -31,4 +31,13 @@ function M.replace_selection(content)
   vim.fn.setreg('s', old, 1)
 end
 
+function M.for_buffer_windows(bufnr, callback)
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local current_bufnr = vim.api.nvim_win_get_buf(win)
+    if current_bufnr == bufnr then
+      callback(win)
+    end
+  end
+end
+
 return M

@@ -1,5 +1,6 @@
 local api = require('nyai.api')
 local config = require('nyai.config')
+local util = require('nyai.util')
 
 local M = {}
 
@@ -25,7 +26,6 @@ end
 
 function M.run(context)
   local current_buffer = vim.api.nvim_get_current_buf()
-  local current_win = vim.api.nvim_get_current_win()
   local request = from_context(context)
 
   local on_resp = function(body)
@@ -54,14 +54,19 @@ function M.run(context)
 
     vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to, false, lines)
 
-    if context.at_last then
-      local num_lines = vim.api.nvim_buf_line_count(current_buffer)
-      vim.api.nvim_win_set_cursor(current_win, { num_lines, 0 })
-    else
-      vim.api.nvim_win_set_cursor(current_win, { #lines + context.insert_to - 1, 0 })
-    end
+    local num_lines = vim.api.nvim_buf_line_count(current_buffer)
+    local current_win = vim.api.nvim_get_current_win()
 
-    vim.cmd.startinsert()
+    util.for_buffer_windows(function(win)
+      if context.at_last then
+        vim.api.nvim_win_set_cursor(win, { num_lines, 0 })
+      else
+        vim.api.nvim_win_set_cursor(win, { #lines + context.insert_to - 1, 0 })
+      end
+      if current_win == win then
+        vim.cmd.startinsert()
+      end
+    end)
   end
 
   vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to, false, { '... WAITING ...' })
