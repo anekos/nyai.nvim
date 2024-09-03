@@ -37,8 +37,7 @@ local function get_syntax_name(line, col)
   return vim.fn.synIDattr(current_syn_id, 'name')
 end
 
-local function extract_valid_line(start_line, end_line)
-  local lines = vim.fn.getline(start_line, end_line)
+local function cramp(lines)
   local start_blank_lines = 0
   local end_blank_lines = 0
 
@@ -74,6 +73,7 @@ local function is_comment(syntax_name)
 end
 
 local function read_buffer()
+  local lines = {}
   local end_line = nil
   local current_line_number = vim.fn.line('.')
   local sections = {}
@@ -90,6 +90,8 @@ local function read_buffer()
         end_line = ln - 1
         break
       end
+    else
+      table.insert(lines, line)
     end
   end
 
@@ -110,10 +112,13 @@ local function read_buffer()
           start_line = ln,
           end_line = end_line,
           role = line_role,
-          lines = extract_valid_line(ln + 1, end_line),
+          lines = cramp(lines),
         })
         end_line = ln - 1
+        lines = {}
       end
+    else
+      table.insert(lines, 1, line)
     end
   end
 
