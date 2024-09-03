@@ -4,8 +4,7 @@ local M = {
     Assistant = '# assistant',
     User = '# user',
     System = '# system',
-  }
+  },
 }
-
 
 return M
