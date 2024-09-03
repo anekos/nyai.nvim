@@ -1,7 +1,8 @@
 local api = require('nyai.api')
 local config = require('nyai.config')
-local util = require('nyai.util')
+local state = require('nyai.state')
 local text = require('nyai.text')
+local util = require('nyai.util')
 
 local M = {}
 
@@ -10,7 +11,7 @@ local function from_context(ctx)
 
   for key, value in pairs(ctx.parameters) do
     if key == 'model' then
-      local got = config.get_model(value)
+      local got = state.get_model(value)
       if got == nil then
         error('Model not found: ' .. value)
       end
@@ -75,6 +76,7 @@ function M.run(context)
   vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to, false, { text.Waiting })
   vim.cmd.stopinsert()
 
+  vim.print(request)
   api.chat_completions(request, on_resp)
 end
 

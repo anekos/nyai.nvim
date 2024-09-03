@@ -5,6 +5,7 @@ local M = {}
 function M.chat_completions(request, callback)
   -- request = { parameters, model }
 
+  vim.print(request)
   local params = vim.deepcopy(request.parameters)
 
   local headers = {

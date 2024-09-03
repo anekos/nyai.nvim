@@ -1,7 +1,8 @@
-local persistent = require('nyai.persistent')
-local event = require('nyai.event')
 local command = require('nyai.command')
 local config = require('nyai.config')
+local event = require('nyai.event')
+local persistent = require('nyai.persistent')
+local state = require('nyai.state')
 
 local M = {}
 
@@ -49,7 +50,7 @@ function M.setup(opts)
 
   vim.api.nvim_create_user_command('NyaiModel', command.model, {
     nargs = '*',
-    complete = config.model_names,
+    complete = state.model_names,
     bar = true,
   })
 end

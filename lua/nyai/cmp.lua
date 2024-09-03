@@ -1,9 +1,9 @@
-local config = require('nyai.config')
 local kind = require('cmp.types.lsp').CompletionItemKind
+local state = require('nyai.state')
 
 local M = {}
 
-local model_names = config.model_names()
+local model_names = state.model_names()
 
 M.new = function()
   local self = setmetatable({}, { __index = M })

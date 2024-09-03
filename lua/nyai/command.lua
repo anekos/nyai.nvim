@@ -1,5 +1,6 @@
 local buffer = require('nyai.buffer')
 local config = require('nyai.config')
+local state = require('nyai.state')
 
 local M = {}
 
@@ -39,10 +40,10 @@ end
 
 function M.model(a)
   if vim.trim(a.args) ~= '' then
-    config.model = config.get_model(a.args)
+    state.set_model(a.args)
     return
   end
-  vim.ui.select(config.all_models(), {
+  vim.ui.select(state.all_models(), {
     prompt = 'Select model',
     format_item = function(model)
       return model.name
