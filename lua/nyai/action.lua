@@ -29,7 +29,7 @@ function M.run(context)
   local request = from_context(context)
 
   local on_resp = function(body)
-    if '... WAITING ...' == vim.fn.getline(context.insert_to + 1) then
+    if '... WAITING ...' == vim.api.nvim_buf_get_lines(current_buffer, context.insert_to, context.insert_to + 1, false)[1] then
       vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to + 1, false, {})
     end
 
