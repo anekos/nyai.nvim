@@ -1,6 +1,7 @@
 local api = require('nyai.api')
 local config = require('nyai.config')
 local util = require('nyai.util')
+local text = require('nyai.text')
 
 local M = {}
 
@@ -29,11 +30,13 @@ function M.run(context)
   local request = from_context(context)
 
   local on_resp = function(body)
-    if '... WAITING ...' == vim.api.nvim_buf_get_lines(current_buffer, context.insert_to, context.insert_to + 1, false)[1] then
+    if
+      text.Waiting == vim.api.nvim_buf_get_lines(current_buffer, context.insert_to, context.insert_to + 1, false)[1]
+    then
       vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to + 1, false, {})
     end
 
-    local lines = { '# assistant', '' }
+    local lines = { text.Header.Assistant, '' }
 
     if context.at_last then
       table.insert(lines, 1, '')
@@ -44,7 +47,7 @@ function M.run(context)
     end
 
     table.insert(lines, '')
-    table.insert(lines, '# user')
+    table.insert(lines, text.Header.User)
     table.insert(lines, '')
     table.insert(lines, '')
 
@@ -69,7 +72,7 @@ function M.run(context)
     end)
   end
 
-  vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to, false, { '... WAITING ...' })
+  vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to, false, { text.Waiting })
   vim.cmd.stopinsert()
 
   api.chat_completions(request, on_resp)

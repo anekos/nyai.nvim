@@ -1,13 +1,14 @@
 local config = require('nyai.config')
+local text = require('nyai.text')
 
 local M = {}
 
 local extract_role = function(line)
-  if line == '# user' then
+  if line == text.Header.User then
     return 'user'
-  elseif line == '# assistant' then
+  elseif line == text.Header.User then
     return 'assistant'
-  elseif line == '# system' then
+  elseif line == text.Header.Assistant then
     return 'system'
   else
     return nil
@@ -151,7 +152,7 @@ function M.get_context()
 end
 
 function M.initialize(buf, fname, float)
-  local lines = { '# user', '', '' }
+  local lines = { text.Header.User, '', '' }
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 
   if not fname then
