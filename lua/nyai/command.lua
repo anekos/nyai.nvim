@@ -5,7 +5,7 @@ local M = {}
 
 M.last_buffer = nil
 
-function M.chat(a)
+function M.chat()
   vim.cmd.edit(buffer.new_filename())
   local buf = vim.api.nvim_get_current_buf()
   buffer.initialize(buf, buffer.new_filename(), false)
