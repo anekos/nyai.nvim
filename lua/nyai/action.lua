@@ -60,7 +60,7 @@ function M.run(context)
     local num_lines = vim.api.nvim_buf_line_count(current_buffer)
     local current_win = vim.api.nvim_get_current_win()
 
-    util.for_buffer_windows(function(win)
+    util.for_buffer_windows(current_buffer, function(win)
       if context.at_last then
         vim.api.nvim_win_set_cursor(win, { num_lines, 0 })
       else
