@@ -31,7 +31,7 @@ function M.copilot(name)
   return {
     name = name,
     id = nil,
-    api_endpoint = M.COPILOT_ENDPOINT,
+    api_endpoint = M.GITHUB_COPILOT_ENDPOINT,
     api_key = vim.env.GITHUB_TOKEN,
   }
 end
