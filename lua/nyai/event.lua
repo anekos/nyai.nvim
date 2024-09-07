@@ -11,6 +11,8 @@ function M.on_filetype()
       vim.schedule(function()
         action.run(context)
       end)
+    else
+      vim.notify('No context found', 'warn')
     end
   end, { buffer = true })
 end
