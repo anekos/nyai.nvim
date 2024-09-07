@@ -16,7 +16,9 @@ function M.chat_completions(request, callback)
   end
 
   params.stream = false
-  params.model = request.model.id
+  if request.model.id then
+    params.model = request.model.id
+  end
 
   curl.request {
     method = 'POST',
