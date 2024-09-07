@@ -14,7 +14,7 @@ M.models = {
   provider.perplexity('Perplexity - Chat Large 70B', 'llama-3.1-sonar-large-128k-chat'),
   provider.perplexity('Perplexity - Instruct Small 8B', 'llama-3.1-8b-instruct'),
   provider.perplexity('Perplexity - Instruct Large 70B', 'llama-3.1-70b-instruct'),
-  provider.openai('Github - Copilot', nil),
+  provider.copilot('Github - Copilot'),
 }
 
 return M
