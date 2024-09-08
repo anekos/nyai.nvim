@@ -15,7 +15,7 @@ local extract_role = function(line)
   end
 end
 
-local try_to_set_parameters = function(line, parameters, overwrite)
+local function try_to_set_parameters(line, parameters, overwrite)
   -- `@foo = bar`
 
   local key, value = string.match(line, '@(%w+)%s*=%s*(.+)')
