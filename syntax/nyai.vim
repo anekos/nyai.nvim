@@ -2,7 +2,7 @@ if exists('b:current_syntax')
   finish
 endif
 
-syntax match NyaiParameterLine /^@model.*$/
+syntax match NyaiParameterLine /^@[a-z_]\+\s*=.*$/
 highlight link NyaiParameterLine Special
 
 syntax match NyaiWaitMessage /\.\.\. WAITING \.\.\./ containedin=ALL
