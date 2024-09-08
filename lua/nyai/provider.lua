@@ -1,3 +1,5 @@
+local P = require('nyai.parameter')
+
 local M = {}
 
 -- https://platform.openai.com/docs/models
@@ -17,23 +19,23 @@ function M.openai(name, id)
     api_key = vim.env.OPENAI_API_KEY,
     -- https://platform.openai.com/docs/api-reference/chat
     parameters = {
-      frequency_penalty = 'float',
-      logit_bias = 'table',
-      logprobs = 'boolean',
-      top_logprobs = 'integer',
-      max_tokens = 'integer',
-      -- n = 'integer',
-      presence_penalty = 'float',
+      frequency_penalty = P.float,
+      -- logit_bias = P.map  -- TODO
+      logprobs = P.boolean,
+      top_logprobs = P.integer,
+      max_tokens = P.integer,
+      -- n = P.integer,
+      presence_penalty = P.float,
       -- response_format
-      seed = 'integer',
+      seed = P.integer,
       -- service_tier = 'string,
-      stop = 'string | string[]',
-      stream = 'boolean',
-      temperature = 'float',
-      top_p = 'float',
+      stop = P.array(P.string),
+      stream = P.boolean,
+      temperature = P.float,
+      top_p = P.float,
       -- tools = 'array',
       -- tool_choice = 'string',
-      -- parallel_tool_calls = 'boolean',
+      -- parallel_tool_calls = P.boolean,
     },
   }
 end
@@ -46,17 +48,17 @@ function M.perplexity(name, id)
     api_key = vim.env.PERPLEXITY_API_KEY,
     -- https://docs.perplexity.ai/api-reference/chat-completions
     parameters = {
-      max_tokens = 'integer',
-      temperature = 'float',
-      top_p = 'float',
-      return_citations = 'boolean',
-      search_domain_filter = 'string[]',
-      -- return_images = 'boolean',
-      -- return_related_questions = 'boolean',
-      search_recency_filter = { 'month', 'week', 'day', 'hour' },
-      top_k = 'integer', -- 0 to 2048 inclusive
-      presence_penalty = 'float', -- -2.0 to 2.0
-      frequency_penalty = 'float', -- 0 to
+      max_tokens = P.integer,
+      temperature = P.float,
+      top_p = P.float,
+      return_citations = P.boolean,
+      search_domain_filter = P.array(P.string),
+      -- return_images = P.boolean,
+      -- return_related_questions = P.boolean,
+      search_recency_filter = P.items { 'month', 'week', 'day', 'hour' },
+      top_k = P.integer, -- 0 to 2048 inclusive
+      presence_penalty = P.float, -- -2.0 to 2.0
+      frequency_penalty = P.float, -- 0 to
     },
   }
 end
@@ -67,6 +69,7 @@ function M.copilot(name)
     id = nil,
     api_endpoint = M.GITHUB_COPILOT_ENDPOINT,
     api_key = vim.env.GITHUB_TOKEN,
+    parameters = {},
   }
 end
 

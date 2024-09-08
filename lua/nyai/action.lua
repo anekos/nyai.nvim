@@ -1,27 +1,12 @@
 local api = require('nyai.api')
-local state = require('nyai.state')
 local text = require('nyai.text')
 local util = require('nyai.util')
 
 local M = {}
 
 local function from_context(ctx)
-  local request = { model = state.current_model(), parameters = {} }
-
-  for key, value in pairs(ctx.parameters) do
-    if key == 'model' then
-      local got = state.get_model(value)
-      if got == nil then
-        error('Model not found: ' .. value)
-      end
-      request.model = got
-    else
-      request.parameters[key] = value
-    end
-  end
-
+  local request = { model = ctx.model, parameters = ctx.parameters }
   request.parameters.messages = ctx.messages
-
   return request
 end
 

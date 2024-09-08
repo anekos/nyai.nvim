@@ -1,4 +1,5 @@
 local config = require('nyai.config')
+local state = require('nyai.state')
 local text = require('nyai.text')
 
 local M = {}
@@ -15,22 +16,8 @@ local extract_role = function(line)
   end
 end
 
-local function try_to_set_parameters(line, parameters, overwrite)
-  -- `@foo = bar`
-
-  local key, value = string.match(line, '@(%w+)%s*=%s*(.+)')
-  if key == nil or value == nil then
-    return
-  end
-
-  value = vim.trim(value)
-
-  if vim.tbl_contains({ 'model' }, key) then
-    if not overwrite and parameters[key] then
-      return
-    end
-    parameters[key] = value
-  end
+local function parse_parameter_line(line)
+  return line:match('@(%w+)%s*=%s*(.+)')
 end
 
 local function get_syntax_name(line, col)
@@ -67,7 +54,7 @@ local function is_heading(syntax_name)
   end
 end
 
-local function is_comment(syntax_name)
+local function is_parameter_line(syntax_name)
   if vim.tbl_contains({ 'NyaiParameterLine' }, syntax_name) then
     return true
   end
@@ -75,17 +62,27 @@ end
 
 local function read_buffer()
   local lines = {}
+  local parameter_lines = {}
   local end_line = nil
   local current_line_number = vim.fn.line('.')
   local sections = {}
   local parameters = {}
 
+  local function read_parameter(line, overwrite)
+    local parameter_name, parameter_value = parse_parameter_line(line)
+    if parameter_name and parameter_value then
+      if not overwrite or not parameter_lines[parameter_name] then
+        parameter_lines[parameter_name] = parameter_value
+      end
+    end
+  end
+
   for ln = current_line_number + 1, vim.fn.line('$'), 1 do
     local syntax_name = get_syntax_name(ln, 1)
     local line = vim.fn.getline(ln)
 
-    if is_comment(syntax_name) then
-      try_to_set_parameters(line, parameters, true)
+    if is_parameter_line(syntax_name) then
+      read_parameter(line, true)
     elseif is_heading(syntax_name) then
       if extract_role(line) then
         end_line = ln - 1
@@ -104,8 +101,8 @@ local function read_buffer()
     local syntax_name = get_syntax_name(ln, 1)
     local line = vim.fn.getline(ln)
 
-    if is_comment(syntax_name) then
-      try_to_set_parameters(line, parameters, false)
+    if is_parameter_line(syntax_name) then
+      read_parameter(line, false)
     elseif is_heading(syntax_name) then
       local line_role = extract_role(line)
       if line_role ~= nil then
@@ -123,16 +120,32 @@ local function read_buffer()
     end
   end
 
-  return sections, parameters
+  local model = state.get_model(parameter_lines.model, true) or state.default_model()
+
+  if model then
+    for parameter_name, parameter_value in pairs(parameter_lines) do
+      if parameter_name ~= 'model' then
+        if model.parameters[parameter_name] and model.parameters[parameter_name].validate(parameter_value) then
+          parameters[parameter_name] = model.parameters[parameter_name].create(parameter_value)
+        else
+          error('Invalid parameter value: ' .. parameter_name .. ' = ' .. parameter_value .. ' (L' .. ')')
+        end
+      end
+    end
+  else
+    error('Invalid model: ' .. parameter_lines.model)
+  end
+
+  return sections, parameters, model
 end
 
 function M.get_context()
-  -- returns { insert_to, at_last, parameters, messages }
+  -- returns { insert_to, at_last, parameters, messages, model }
 
   local result = {}
   local messages = {}
 
-  local sections, parameters = read_buffer()
+  local sections, parameters, model = read_buffer()
 
   if not sections or #sections < 1 or sections[#sections].role ~= 'user' then
     return nil
@@ -147,6 +160,7 @@ function M.get_context()
 
   result.parameters = parameters
   result.messages = messages
+  result.model = model
 
   return result
 end
