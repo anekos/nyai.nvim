@@ -6,13 +6,13 @@ local M = {}
 
 function M.on_filetype()
   vim.keymap.set({ 'n', 'i' }, '<C-CR>', function()
-    local context = buffer.get_context()
+    local context = buffer.get_context(true)
     if context ~= nil then
       vim.schedule(function()
         action.run(context)
       end)
     else
-      vim.notify('No context found', 'warn')
+      vim.notify('Not in user context', 'warn')
     end
   end, { buffer = true })
 end

@@ -139,7 +139,7 @@ local function read_buffer()
   return sections, parameters, model
 end
 
-function M.get_context()
+function M.get_context(user_only)
   -- returns { insert_to, at_last, parameters, messages, model }
 
   local result = {}
@@ -147,7 +147,7 @@ function M.get_context()
 
   local sections, parameters, model = read_buffer()
 
-  if not sections or #sections < 1 or sections[#sections].role ~= 'user' then
+  if not sections or #sections < 1 or (user_only and sections[#sections].role ~= 'user') then
     return nil
   end
 

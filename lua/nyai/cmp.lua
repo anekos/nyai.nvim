@@ -71,7 +71,7 @@ function M:complete(params, callback)
 
   local current = { ctx.bufnr, ctx.cursor.line }
   if buffer_context == nil or not vim.deep_equal(current, last_state) then
-    buffer_context = buffer.get_context()
+    buffer_context = buffer.get_context(false)
   end
 
   local model = buffer_context and buffer_context.model
