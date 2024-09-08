@@ -68,7 +68,7 @@ local function is_heading(syntax_name)
 end
 
 local function is_comment(syntax_name)
-  if vim.tbl_contains({ 'Comment' }, syntax_name) then
+  if vim.tbl_contains({ 'NyaiParameterLine' }, syntax_name) then
     return true
   end
 end
