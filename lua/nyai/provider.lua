@@ -73,4 +73,34 @@ function M.copilot(name)
   }
 end
 
+function M.ollama(name, id)
+  return {
+    name = name,
+    id = id,
+    api_endpoint = 'http://localhost:11434/api/chat',
+    api_key = nil,
+    parameters = {},
+  }
+end
+
+function M.ollama_generate(host, port)
+  local curl = require('plenary.curl')
+
+  if host == nil then
+    host = 'localhost'
+  end
+  if port == nil then
+    port = 11434
+  end
+
+  local api_endpoint = 'http://' .. host .. ':' .. tostring(port) .. '/api/tags'
+  local response = curl.request {
+    method = 'GET',
+    url = api_endpoint,
+  }
+  return vim.tbl_map(function(it)
+    return M.ollama('Ollama - ' .. it.name, it.model)
+  end, vim.fn.json_decode(response.body)['models'])
+end
+
 return M
