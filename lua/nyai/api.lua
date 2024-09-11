@@ -1,5 +1,7 @@
 local curl = require('plenary.curl')
 
+local util = require('nyai.util')
+
 local M = {}
 
 function M.chat_completions(request, callback)
@@ -12,7 +14,16 @@ function M.chat_completions(request, callback)
   }
 
   if request.model.api_key then
-    headers['Authorization'] = 'Bearer ' .. request.model.api_key
+    local api_key = request.model.api_key
+    if type(api_key) == 'function' then
+      api_key = api_key()
+    end
+    headers['Authorization'] = 'Bearer ' .. api_key
+  end
+
+  local model_headers = util.value_or_function(request.model.headers)
+  if model_headers then
+    headers = vim.tbl_extend('force', headers, model_headers)
   end
 
   params.stream = false

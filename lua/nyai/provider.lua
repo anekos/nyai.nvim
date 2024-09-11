@@ -68,8 +68,11 @@ function M.copilot(name)
     name = name,
     id = nil,
     api_endpoint = M.GITHUB_COPILOT_ENDPOINT,
-    api_key = vim.env.GITHUB_TOKEN,
+    api_key = function()
+      return require('nyai.provider.copilot').authorize()
+    end,
     parameters = {},
+    headers = require('nyai.provider.copilot').common_headers,
   }
 end
 

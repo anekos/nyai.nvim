@@ -40,4 +40,11 @@ function M.for_buffer_windows(bufnr, callback)
   end
 end
 
+function M.value_or_function(v)
+  if type(v) == 'function' then
+    return v()
+  end
+  return v
+end
+
 return M
