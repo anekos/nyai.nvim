@@ -29,8 +29,11 @@ return function(callbacks)
         return
       end
       local text = data.choices[1].delta.content
-      if text == vim.NIL then
+      if text == vim.NIL or text == nil then
         return
+      end
+      if type(text) ~= 'string' then
+        error('Invalid response from API: ' .. vim.inspect(data))
       end
       callbacks.on_text(text)
     end)
