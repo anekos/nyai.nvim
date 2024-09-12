@@ -38,6 +38,11 @@ function M.chat_completions(request, callbacks)
     body = vim.fn.json_encode(params),
     timeout = 60 * 1000,
     stream = request.model.stream(callbacks),
+    callback = function(resp)
+      if resp.status ~= 200 then
+        error('API Error: ' .. resp.body)
+      end
+    end,
   }
 end
 
