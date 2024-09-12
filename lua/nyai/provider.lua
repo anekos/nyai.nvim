@@ -37,6 +37,7 @@ function M.openai(name, id)
       -- tool_choice = 'string',
       -- parallel_tool_calls = P.boolean,
     },
+    stream = require('nyai.api.stream.openai'),
   }
 end
 
@@ -60,6 +61,7 @@ function M.perplexity(name, id)
       presence_penalty = P.float, -- -2.0 to 2.0
       frequency_penalty = P.float, -- 0 to
     },
+    stream = require('nyai.api.stream.openai'),
   }
 end
 
@@ -73,6 +75,7 @@ function M.copilot(name)
     end,
     parameters = {},
     headers = require('nyai.provider.copilot').common_headers,
+    stream = require('nyai.api.stream.openai'),
   }
 end
 
@@ -83,6 +86,7 @@ function M.ollama(name, id)
     api_endpoint = 'http://localhost:11434/api/chat',
     api_key = nil,
     parameters = {},
+    stream = require('nyai.api.stream.ollama'),
   }
 end
 

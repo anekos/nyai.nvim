@@ -4,7 +4,7 @@ local util = require('nyai.util')
 
 local M = {}
 
-function M.chat_completions(request, callback)
+function M.chat_completions(request, callbacks)
   -- request = { parameters, model }
 
   local params = vim.deepcopy(request.parameters)
@@ -26,7 +26,7 @@ function M.chat_completions(request, callback)
     headers = vim.tbl_extend('force', headers, model_headers)
   end
 
-  params.stream = false
+  params.stream = true
   if request.model.id then
     params.model = request.model.id
   end
@@ -37,25 +37,7 @@ function M.chat_completions(request, callback)
     headers = headers,
     body = vim.fn.json_encode(params),
     timeout = 60 * 1000,
-    callback = function(resp)
-      if resp.status ~= 200 then
-        error('Failed to request chat completions: ' .. resp.body)
-      end
-
-      vim.schedule(function()
-        local body = vim.fn.json_decode(resp.body)
-
-        -- Ollama
-        -- https://github.com/ollama/ollama/blob/main/docs/api.md
-        if body.message and body.message.content then
-          callback(body.message.content)
-          return
-        end
-
-        -- Open AI
-        callback(body.choices[1].message.content)
-      end)
-    end,
+    stream = request.model.stream(callbacks),
   }
 end
 
