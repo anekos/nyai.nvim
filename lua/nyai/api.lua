@@ -7,7 +7,7 @@ local M = {}
 function M.chat_completions(request, callbacks)
   -- request = { parameters, model }
 
-  local params = vim.deepcopy(request.parameters)
+  local params = vim.tbl_extend('force', request.model.default_parameters, vim.deepcopy(request.parameters))
 
   local headers = {
     content_type = 'application/json',
@@ -15,10 +15,17 @@ function M.chat_completions(request, callbacks)
 
   if request.model.api_key then
     local api_key = request.model.api_key
+
     if type(api_key) == 'function' then
       api_key = api_key()
     end
-    headers['Authorization'] = 'Bearer ' .. api_key
+
+    if type(api_key) == 'table' then
+      local api_key_header, api_key_value = unpack(api_key)
+      headers[api_key_header] = api_key_value
+    else
+      headers['Authorization'] = 'Bearer ' .. api_key
+    end
   end
 
   local model_headers = util.value_or_function(request.model.headers)

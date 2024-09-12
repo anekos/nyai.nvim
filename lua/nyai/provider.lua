@@ -2,6 +2,30 @@ local P = require('nyai.parameter')
 
 local M = {}
 
+function M.anthropic(name, id)
+  return {
+    name = name,
+    id = id,
+    api_endpoint = 'https://api.anthropic.com/v1/messages',
+    api_key = { 'x-api-key', vim.env.ANTHROPIC_API_KEY },
+    headers = {
+      ['anthropic-version'] = '2023-06-01',
+    },
+    -- https://docs.anthropic.com/en/api/messages
+    parameters = {
+      max_tokens = P.integer,
+      system = P.string,
+      temperature = P.float,
+      top_k = P.integer,
+      top_p = P.float,
+    },
+    default_parameters = {
+      max_tokens = 1024,
+    },
+    stream = require('nyai.api.stream.anthropic'),
+  }
+end
+
 function M.openai(name, id)
   return {
     name = name,
