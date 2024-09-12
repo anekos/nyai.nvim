@@ -24,18 +24,24 @@ return function(callbacks)
 
     local data = vim.json.decode(body)
 
+    if #data.choices == 0 then
+      return
+    end
+
+    local text = data.choices[1].delta.content
+    if text == vim.NIL or text == nil then
+      return
+    end
+    if type(text) ~= 'string' then
+      error('Invalid response from API: ' .. vim.inspect(data))
+    end
+
     vim.schedule(function()
-      if #data.choices == 0 then
-        return
-      end
-      local text = data.choices[1].delta.content
-      if text == vim.NIL or text == nil then
-        return
-      end
-      if type(text) ~= 'string' then
-        error('Invalid response from API: ' .. vim.inspect(data))
-      end
       callbacks.on_text(text)
     end)
+
+    if data.choices[1].finish_reason ~= vim.NIL then
+      vim.schedule(callbacks.on_end)
+    end
   end
 end

@@ -7,7 +7,7 @@ local M = {}
 function M.chat_completions(request, callbacks)
   -- request = { parameters, model }
 
-  local params = vim.tbl_extend('force', request.model.default_parameters, vim.deepcopy(request.parameters))
+  local params = vim.tbl_extend('force', request.model.default_parameters or {}, vim.deepcopy(request.parameters))
 
   local headers = {
     content_type = 'application/json',
