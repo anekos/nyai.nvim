@@ -2,20 +2,11 @@ local P = require('nyai.parameter')
 
 local M = {}
 
--- https://platform.openai.com/docs/models
-M.OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions'
-
--- https://docs.perplexity.ai/reference/post_chat_completions
--- https://docs.perplexity.ai/guides/model-cards
-M.PERPLEXITY_ENDPOINT = 'https://api.perplexity.ai/chat/completions'
-
-M.GITHUB_COPILOT_ENDPOINT = 'https://api.githubcopilot.com/chat/completions'
-
 function M.openai(name, id)
   return {
     name = name,
     id = id,
-    api_endpoint = M.OPENAI_ENDPOINT,
+    api_endpoint = 'https://api.openai.com/v1/chat/completions',
     api_key = vim.env.OPENAI_API_KEY,
     -- https://platform.openai.com/docs/api-reference/chat
     parameters = {
@@ -45,7 +36,7 @@ function M.perplexity(name, id)
   return {
     name = name,
     id = id,
-    api_endpoint = M.PERPLEXITY_ENDPOINT,
+    api_endpoint = 'https://api.perplexity.ai/chat/completions',
     api_key = vim.env.PERPLEXITY_API_KEY,
     -- https://docs.perplexity.ai/api-reference/chat-completions
     parameters = {
@@ -69,7 +60,7 @@ function M.copilot(name)
   return {
     name = name,
     id = nil,
-    api_endpoint = M.GITHUB_COPILOT_ENDPOINT,
+    api_endpoint = 'https://api.githubcopilot.com/chat/completions',
     api_key = function()
       return require('nyai.provider.copilot').authorize()
     end,
