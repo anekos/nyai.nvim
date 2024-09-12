@@ -7,9 +7,9 @@ local M = {}
 local extract_role = function(line)
   if line == text.Header.User then
     return 'user'
-  elseif line == text.Header.User then
-    return 'assistant'
   elseif line == text.Header.Assistant then
+    return 'assistant'
+  elseif line == text.Header.System then
     return 'system'
   else
     return nil
