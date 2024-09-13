@@ -7,9 +7,9 @@ function M.anthropic(name, id)
     name = name,
     id = id,
     api_endpoint = 'https://api.anthropic.com/v1/messages',
-    api_key = { 'x-api-key', vim.env.ANTHROPIC_API_KEY },
     headers = {
       ['anthropic-version'] = '2023-06-01',
+      ['x-api-key'] = vim.env.ANTHROPIC_API_KEY,
     },
     -- https://docs.anthropic.com/en/api/messages
     parameters = {
@@ -27,11 +27,14 @@ function M.anthropic(name, id)
 end
 
 function M.openai(name, id)
+  local api_key = vim.env.OPENAI_API_KEY
   return {
     name = name,
     id = id,
     api_endpoint = 'https://api.openai.com/v1/chat/completions',
-    api_key = vim.env.OPENAI_API_KEY,
+    headers = {
+      ['Authorization'] = 'Bearer ' .. api_key,
+    },
     -- https://platform.openai.com/docs/api-reference/chat
     parameters = {
       frequency_penalty = P.float,
@@ -57,11 +60,14 @@ function M.openai(name, id)
 end
 
 function M.perplexity(name, id)
+  local api_key = vim.env.PERPLEXITY_API_KEY
   return {
     name = name,
     id = id,
     api_endpoint = 'https://api.perplexity.ai/chat/completions',
-    api_key = vim.env.PERPLEXITY_API_KEY,
+    headers = {
+      ['Authorization'] = 'Bearer ' .. api_key,
+    },
     -- https://docs.perplexity.ai/api-reference/chat-completions
     parameters = {
       max_tokens = P.integer,
@@ -89,7 +95,11 @@ function M.copilot(name)
       return require('nyai.provider.copilot').authorize()
     end,
     parameters = {},
-    headers = require('nyai.provider.copilot').common_headers,
+    headers = vim.tbl_extend('force', require('nyai.provider.copilot').common_headers, {
+      ['Authorization'] = function()
+        return 'Bearer ' .. require('nyai.provider.copilot').authorize()
+      end,
+    }),
     stream = require('nyai.api.stream.openai'),
   }
 end

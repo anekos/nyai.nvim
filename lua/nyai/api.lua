@@ -4,36 +4,25 @@ local util = require('nyai.util')
 
 local M = {}
 
+local function generate_headers(headers)
+  local result = {}
+  for key, value in pairs(headers) do
+    result[key] = util.value_or_function(value)
+  end
+  return result
+end
+
 function M.chat_completions(request, callbacks)
   -- request = { parameters, model }
 
   local params = vim.tbl_extend('force', request.model.default_parameters or {}, vim.deepcopy(request.parameters))
 
-  local headers = {
+  local headers = generate_headers(vim.tbl_extend('force', {
     content_type = 'application/json',
-  }
-
-  if request.model.api_key then
-    local api_key = request.model.api_key
-
-    if type(api_key) == 'function' then
-      api_key = api_key()
-    end
-
-    if type(api_key) == 'table' then
-      local api_key_header, api_key_value = unpack(api_key)
-      headers[api_key_header] = api_key_value
-    else
-      headers['Authorization'] = 'Bearer ' .. api_key
-    end
-  end
-
-  local model_headers = util.value_or_function(request.model.headers)
-  if model_headers then
-    headers = vim.tbl_extend('force', headers, model_headers)
-  end
+  }, request.model.headers or {}))
 
   params.stream = true
+
   if request.model.id then
     params.model = request.model.id
   end
