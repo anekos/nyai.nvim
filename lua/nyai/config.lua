@@ -1,6 +1,7 @@
 local M = {
   user_models = {},
   directory = vim.fn.expand('~/nyai'),
+  insert_default_model = false,
   float_options = function()
     local columns = vim.api.nvim_get_option_value('columns', {})
     local lines = vim.api.nvim_get_option_value('lines', {})

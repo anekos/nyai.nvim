@@ -167,6 +167,10 @@ end
 
 function M.initialize(buf, fname, float)
   local lines = { text.Header.User, '', '' }
+  if config.insert_default_model then
+    table.insert(lines, 1, '@model = ' .. state.default_model().name)
+    table.insert(lines, 2, '')
+  end
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 
   if not fname then
@@ -194,7 +198,7 @@ function M.new_filename()
 end
 
 function M.ready_to_edit()
-  vim.fn.cursor(3, 0)
+  vim.fn.cursor(vim.fn.line('$'), 0)
   vim.cmd.startinsert()
 end
 
