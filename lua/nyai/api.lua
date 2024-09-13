@@ -8,8 +8,6 @@ function M.chat_completions(request, callbacks)
   local headers = vim.tbl_extend('force', { ['Content-Type'] = 'application/json' }, request.headers or {})
   local response = request.response(callbacks)
 
-  vim.print(request)
-
   curl.request {
     method = 'POST',
     url = request.url,
