@@ -9,9 +9,10 @@ end
 -- `request` function should returns `{headers, body, query}`
 
 function M.anthropic(name, model_id)
+  -- https://docs.anthropic.com/en/api/messages
+
   return {
     name = name,
-    -- https://docs.anthropic.com/en/api/messages
     parameters = {
       max_tokens = P.integer,
       system = P.string,
@@ -39,7 +40,10 @@ function M.anthropic(name, model_id)
 end
 
 function M.gemini(name)
+  -- https://ai.google.dev/gemini-api/docs/text-generation?lang=rest
+
   local api_key = vim.env.GEMINI_API_KEY
+
   return {
     name = name,
     parameters = {},
@@ -70,10 +74,12 @@ function M.gemini(name)
 end
 
 function M.openai(name, model_id)
+  -- https://platform.openai.com/docs/api-reference/chat
+
   local api_key = vim.env.OPENAI_API_KEY
+
   return {
     name = name,
-    -- https://platform.openai.com/docs/api-reference/chat
     parameters = {
       frequency_penalty = P.float,
       -- logit_bias = P.map  -- TODO
@@ -111,10 +117,12 @@ function M.openai(name, model_id)
 end
 
 function M.perplexity(name, model_id)
+  -- https://docs.perplexity.ai/api-reference/chat-completions
+
   local api_key = vim.env.PERPLEXITY_API_KEY
+
   return {
     name = name,
-    -- https://docs.perplexity.ai/api-reference/chat-completions
     parameters = {
       max_tokens = P.integer,
       temperature = P.float,
