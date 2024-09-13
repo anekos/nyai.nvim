@@ -1,14 +1,24 @@
 local M = {}
 
-local function fill_lines(buf, n)
+local function undojoin(self)
+  if self.first then
+    self.first = false
+    return
+  end
+  vim.cmd.undojoin()
+end
+
+local function fill_lines(self, buf, n)
   local bottom = vim.fn.line('$')
   local right = #vim.fn.getline(bottom)
   local new_lines = {}
+
   for _ = 0, n, 1 do
     table.insert(new_lines, '')
   end
+
+  undojoin(self)
   vim.api.nvim_buf_set_text(buf, bottom - 1, right, bottom - 1, right, new_lines)
-  vim.cmd.undojoin()
 end
 
 local function render(self, text, opts)
@@ -18,11 +28,12 @@ local function render(self, text, opts)
 
   local buf = vim.api.nvim_get_current_buf()
 
-  fill_lines(buf, line - vim.fn.line('$'))
+  fill_lines(self, buf, line - vim.fn.line('$'))
 
   local lines = vim.split(text, '\n')
+
+  undojoin(self)
   vim.api.nvim_buf_set_text(buf, line - 1, col - 1, line - 1, col - 1, lines)
-  vim.cmd.undojoin()
 
   self.line = #lines + line - 1
   if #lines == 1 then
@@ -59,7 +70,6 @@ local function remove_marker(self, name)
     )
     -- TODO Consider col
     self.line = self.line - (marker.finish.line - marker.start.line)
-    vim.cmd.undojoin()
   end
 
   self.markers[name] = nil
@@ -67,6 +77,7 @@ end
 
 function M.new(otps)
   return vim.tbl_extend('error', otps, {
+    first = true,
     render = render,
     markers = {},
     remove_marker = remove_marker,
