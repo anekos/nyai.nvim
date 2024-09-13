@@ -41,7 +41,6 @@ return function(callbacks)
     end)
 
     if data.choices[1].finish_reason == 'stop' then
-      debug(data.choices[1])
       vim.schedule(callbacks.on_end)
     end
   end
