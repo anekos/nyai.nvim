@@ -16,19 +16,15 @@ function M.run(context)
 
   local callbacks = {
     on_start = function()
-      if
-        text.Waiting == vim.api.nvim_buf_get_lines(current_buffer, context.insert_to, context.insert_to + 1, false)[1]
-      then
-        vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to + 1, false, {})
-      end
-
-      renderer:render('\n' .. text.Header.Assistant .. '\n\n')
+      renderer:render(text.Header.Assistant .. '\n\n')
     end,
     on_text = function(t)
       renderer:render(t)
     end,
     on_end = function()
       renderer:render('\n\n' .. text.Header.User .. '\n\n')
+      renderer:remove_marker('Waiting')
+
       util.for_buffer_windows(current_buffer, function(win)
         vim.api.nvim_win_set_cursor(win, { renderer.line, 0 })
         if current_win == win then
@@ -38,7 +34,8 @@ function M.run(context)
     end,
   }
 
-  vim.api.nvim_buf_set_lines(current_buffer, context.insert_to, context.insert_to, false, { text.Waiting })
+  renderer:render('\n')
+  renderer:render(text.Waiting .. '\n', { marker_name = 'Waiting' })
   vim.cmd.stopinsert()
 
   api.chat_completions(request, callbacks)
