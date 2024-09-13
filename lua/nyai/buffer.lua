@@ -183,11 +183,6 @@ function M.initialize(buf, fname, float)
   vim.api.nvim_set_option_value('modified', false, { buf = buf })
 end
 
-function M.ready_to_edit()
-  vim.fn.cursor(3, 0)
-  vim.cmd.startinsert()
-end
-
 function M.new_filename()
   local result = config.directory .. vim.fn.strftime('/%Y%m%d-%H%M.nyai')
   local no = 0
@@ -196,6 +191,11 @@ function M.new_filename()
     result = vim.fn.substitute(result, [[\.nyai$]], '-' .. no .. '.nyai', '')
   end
   return result
+end
+
+function M.ready_to_edit()
+  vim.fn.cursor(3, 0)
+  vim.cmd.startinsert()
 end
 
 return M
