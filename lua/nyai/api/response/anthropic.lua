@@ -71,10 +71,6 @@ return function(callbacks)
         return
       end
     end
-
-    -- vim.schedule(function()
-    --   debug('Line', line)
-    -- end)
   end
 
   local on_complete = function() end
