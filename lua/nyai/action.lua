@@ -10,6 +10,7 @@ function M.run(context)
   local request = context.model.request(context)
   local renderer = require('nyai.buffer.renderer').new {
     win = current_win,
+    buf = current_buffer,
     line = context.insert_to + 1,
     col = 1,
   }
@@ -24,9 +25,10 @@ function M.run(context)
     on_end = function()
       renderer:render('\n\n' .. text.Header.User .. '\n\n')
       renderer:remove_marker('Waiting')
+      renderer:finish()
 
       util.for_buffer_windows(current_buffer, function(win)
-        vim.api.nvim_win_set_cursor(win, { renderer.line, 0 })
+        vim.api.nvim_win_set_cursor(win, { renderer.state.line, 0 })
         if current_win == win then
           vim.cmd.startinsert()
         end
