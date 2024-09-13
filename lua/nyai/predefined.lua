@@ -23,6 +23,7 @@ M.models = {
   provider.perplexity('Perplexity - Instruct Large 70B', 'llama-3.1-70b-instruct'),
   -- No models
   provider.copilot('Github - Copilot'),
+  provider.gemini('Google - Gemini'),
 }
 
 return M
