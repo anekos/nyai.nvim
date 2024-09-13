@@ -32,9 +32,40 @@ function M.anthropic(name, model_id)
           stream = true,
           max_tokens = 1024,
         }, context.parameters),
-        stream = require('nyai.api.stream.anthropic'),
+        response = require('nyai.api.response.anthropic'),
       }
     end,
+  }
+end
+
+function M.gemini(name)
+  local api_key = vim.env.GEMINI_API_KEY
+  return {
+    name = name,
+    parameters = {},
+    request = function(context)
+      local contents = {}
+      for _, message in ipairs(context.messages) do
+        local role = message.role
+        if role == 'assistant' then
+          role = 'model'
+        end
+        table.insert(contents, {
+          role = role,
+          parts = { { text = message.content } },
+        })
+      end
+      return {
+        url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent',
+        query = { key = api_key },
+        headers = {},
+        body = { contents = contents },
+        response = require('nyai.api.response.gemini'),
+      }
+    end,
+    default_queries = {
+      key = api_key,
+    },
   }
 end
 
@@ -73,7 +104,7 @@ function M.openai(name, model_id)
           messages = context.messages,
           stream = true,
         }, context.parameters),
-        stream = require('nyai.api.stream.openai'),
+        response = require('nyai.api.response.openai'),
       }
     end,
   }
@@ -108,7 +139,7 @@ function M.perplexity(name, model_id)
           messages = context.messages,
           stream = true,
         }, context.parameters),
-        stream = require('nyai.api.stream.openai'),
+        response = require('nyai.api.response.openai'),
       }
     end,
   }
@@ -133,7 +164,7 @@ function M.copilot(name)
           messages = context.messages,
           stream = true,
         }, context.parameters),
-        stream = require('nyai.api.stream.openai'),
+        response = require('nyai.api.response.openai'),
       }
     end,
   }
@@ -151,7 +182,7 @@ function M.ollama(name, model_id)
           messages = context.messages,
           stream = true,
         }, context.parameters),
-        stream = require('nyai.api.stream.ollama'),
+        response = require('nyai.api.response.ollama'),
       }
     end,
   }

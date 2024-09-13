@@ -20,7 +20,7 @@ local ignore_data_types = {
 return function(callbacks)
   local first = true
 
-  return function(err, line)
+  local on_stream = function(err, line)
     if err then
       error('Failed to process a stream: ' .. tostring(err))
       return
@@ -76,4 +76,11 @@ return function(callbacks)
     --   debug('Line', line)
     -- end)
   end
+
+  local on_complete = function() end
+
+  return {
+    on_stream = on_stream,
+    on_complete = on_complete,
+  }
 end
