@@ -27,7 +27,7 @@ function M.float(opts)
   end
 
   local win = vim.api.nvim_open_win(buf, true, config.float_options())
-  vim.api.nvim_win_set_option(win, 'winblend', 20)
+  vim.api.nvim_set_option_value('winblend', 20, { win = win })
 
   if new_buffer then
     buffer.initialize(buf, fname, true)

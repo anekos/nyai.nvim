@@ -2,8 +2,8 @@ local M = {
   user_models = {},
   directory = vim.fn.expand('~/nyai'),
   float_options = function()
-    local columns = vim.api.nvim_get_option('columns')
-    local lines = vim.api.nvim_get_option('lines')
+    local columns = vim.api.nvim_get_option_value('columns', {})
+    local lines = vim.api.nvim_get_option_value('lines', {})
 
     local width = math.floor(math.max(columns / 3, 70))
     local height = math.floor(math.max(lines / 3, 30))
