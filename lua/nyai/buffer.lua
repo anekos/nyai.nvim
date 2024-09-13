@@ -71,7 +71,7 @@ local function read_buffer()
   local function read_parameter(line, overwrite)
     local parameter_name, parameter_value = parse_parameter_line(line)
     if parameter_name and parameter_value then
-      if not overwrite or not parameter_lines[parameter_name] then
+      if overwrite or not parameter_lines[parameter_name] then
         parameter_lines[parameter_name] = parameter_value
       end
     end
