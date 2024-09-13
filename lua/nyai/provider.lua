@@ -2,15 +2,15 @@ local P = require('nyai.parameter')
 
 local M = {}
 
-function M.anthropic(name, id)
+local function merge(t1, t2)
+  return vim.tbl_extend('force', t1, t2)
+end
+
+-- `request` function should returns `{headers, body, query}`
+
+function M.anthropic(name, model_id)
   return {
     name = name,
-    id = id,
-    api_endpoint = 'https://api.anthropic.com/v1/messages',
-    api_key = { 'x-api-key', vim.env.ANTHROPIC_API_KEY },
-    headers = {
-      ['anthropic-version'] = '2023-06-01',
-    },
     -- https://docs.anthropic.com/en/api/messages
     parameters = {
       max_tokens = P.integer,
@@ -19,19 +19,29 @@ function M.anthropic(name, id)
       top_k = P.integer,
       top_p = P.float,
     },
-    default_parameters = {
-      max_tokens = 1024,
-    },
-    stream = require('nyai.api.stream.anthropic'),
+    request = function(context)
+      return {
+        url = 'https://api.anthropic.com/v1/messages',
+        headers = {
+          ['x-api-key'] = vim.env.ANTHROPIC_API_KEY,
+          ['anthropic-version'] = '2023-06-01',
+        },
+        body = merge({
+          model = model_id,
+          messages = context.messages,
+          stream = true,
+          max_tokens = 1024,
+        }, context.parameters),
+        stream = require('nyai.api.stream.anthropic'),
+      }
+    end,
   }
 end
 
-function M.openai(name, id)
+function M.openai(name, model_id)
+  local api_key = vim.env.OPENAI_API_KEY
   return {
     name = name,
-    id = id,
-    api_endpoint = 'https://api.openai.com/v1/chat/completions',
-    api_key = vim.env.OPENAI_API_KEY,
     -- https://platform.openai.com/docs/api-reference/chat
     parameters = {
       frequency_penalty = P.float,
@@ -52,16 +62,27 @@ function M.openai(name, id)
       -- tool_choice = 'string',
       -- parallel_tool_calls = P.boolean,
     },
-    stream = require('nyai.api.stream.openai'),
+    request = function(context)
+      return {
+        url = 'https://api.openai.com/v1/chat/completions',
+        headers = {
+          ['Authorization'] = 'Bearer ' .. api_key,
+        },
+        body = merge({
+          model = model_id,
+          messages = context.messages,
+          stream = true,
+        }, context.parameters),
+        stream = require('nyai.api.stream.openai'),
+      }
+    end,
   }
 end
 
-function M.perplexity(name, id)
+function M.perplexity(name, model_id)
+  local api_key = vim.env.PERPLEXITY_API_KEY
   return {
     name = name,
-    id = id,
-    api_endpoint = 'https://api.perplexity.ai/chat/completions',
-    api_key = vim.env.PERPLEXITY_API_KEY,
     -- https://docs.perplexity.ai/api-reference/chat-completions
     parameters = {
       max_tokens = P.integer,
@@ -76,32 +97,63 @@ function M.perplexity(name, id)
       presence_penalty = P.float, -- -2.0 to 2.0
       frequency_penalty = P.float, -- 0 to
     },
-    stream = require('nyai.api.stream.openai'),
+    request = function(context)
+      return {
+        url = 'https://api.perplexity.ai/chat/completions',
+        headers = {
+          ['Authorization'] = 'Bearer ' .. api_key,
+        },
+        body = merge({
+          model = model_id,
+          messages = context.messages,
+          stream = true,
+        }, context.parameters),
+        stream = require('nyai.api.stream.openai'),
+      }
+    end,
   }
 end
 
 function M.copilot(name)
+  local api_key = function()
+    return require('nyai.provider.copilot').authorize()
+  end
+
   return {
     name = name,
-    id = nil,
-    api_endpoint = 'https://api.githubcopilot.com/chat/completions',
-    api_key = function()
-      return require('nyai.provider.copilot').authorize()
-    end,
     parameters = {},
-    headers = require('nyai.provider.copilot').common_headers,
-    stream = require('nyai.api.stream.openai'),
+    request = function(context)
+      return {
+        url = 'https://api.githubcopilot.com/chat/completions',
+        headers = {
+          ['Authorization'] = 'Bearer ' .. api_key(),
+        },
+        body = merge({
+          model = context.model.id,
+          messages = context.messages,
+          stream = true,
+        }, context.parameters),
+        stream = require('nyai.api.stream.openai'),
+      }
+    end,
   }
 end
 
-function M.ollama(name, id)
+function M.ollama(name, model_id)
   return {
     name = name,
-    id = id,
-    api_endpoint = 'http://localhost:11434/api/chat',
-    api_key = nil,
     parameters = {},
-    stream = require('nyai.api.stream.ollama'),
+    request = function(context)
+      return {
+        url = 'http://localhost:11434/api/chat',
+        body = merge({
+          model = model_id,
+          messages = context.messages,
+          stream = true,
+        }, context.parameters),
+        stream = require('nyai.api.stream.ollama'),
+      }
+    end,
   }
 end
 

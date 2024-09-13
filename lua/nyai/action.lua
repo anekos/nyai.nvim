@@ -4,16 +4,10 @@ local util = require('nyai.util')
 
 local M = {}
 
-local function from_context(ctx)
-  local request = { model = ctx.model, parameters = ctx.parameters }
-  request.parameters.messages = ctx.messages
-  return request
-end
-
 function M.run(context)
   local current_win = vim.api.nvim_get_current_win()
   local current_buffer = vim.api.nvim_get_current_buf()
-  local request = from_context(context)
+  local request = context.model.request(context)
   local renderer = require('nyai.buffer.renderer').new {
     win = current_win,
     line = context.insert_to + 1,

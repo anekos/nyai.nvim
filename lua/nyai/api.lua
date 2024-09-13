@@ -1,50 +1,22 @@
 local curl = require('plenary.curl')
 
-local util = require('nyai.util')
-
 local M = {}
 
 function M.chat_completions(request, callbacks)
-  -- request = { parameters, model }
+  -- request = { url, headers, body, query, stream }
 
-  local params = vim.tbl_extend('force', request.model.default_parameters or {}, vim.deepcopy(request.parameters))
+  local headers = vim.tbl_extend('force', { ['Content-Type'] = 'application/json' }, request.headers or {})
 
-  local headers = {
-    content_type = 'application/json',
-  }
-
-  if request.model.api_key then
-    local api_key = request.model.api_key
-
-    if type(api_key) == 'function' then
-      api_key = api_key()
-    end
-
-    if type(api_key) == 'table' then
-      local api_key_header, api_key_value = unpack(api_key)
-      headers[api_key_header] = api_key_value
-    else
-      headers['Authorization'] = 'Bearer ' .. api_key
-    end
-  end
-
-  local model_headers = util.value_or_function(request.model.headers)
-  if model_headers then
-    headers = vim.tbl_extend('force', headers, model_headers)
-  end
-
-  params.stream = true
-  if request.model.id then
-    params.model = request.model.id
-  end
+  vim.print(request)
 
   curl.request {
     method = 'POST',
-    url = request.model.api_endpoint,
+    url = request.url,
+    query = request.query or {},
     headers = headers,
-    body = vim.fn.json_encode(params),
+    body = vim.json.encode(request.body),
     timeout = 60 * 1000,
-    stream = request.model.stream(callbacks),
+    stream = request.stream(callbacks),
     callback = function(resp)
       if resp.status ~= 200 then
         error('API Error: ' .. resp.body)

@@ -50,6 +50,10 @@ return function(callbacks)
     if stream_type == 'data' then
       local data = vim.json.decode(body)
 
+      if data.type == 'error' then
+        error(data.error.message)
+      end
+
       if data.delta then
         if data.delta.type == 'text_delta' then
           vim.schedule(function()
