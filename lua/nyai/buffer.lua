@@ -179,8 +179,8 @@ function M.initialize(buf, fname, float)
     vim.api.nvim_buf_set_keymap(buf, 'n', '<Esc>', '<Cmd>wincmd c<CR>', { noremap = true })
   end
 
-  vim.api.nvim_buf_set_option(buf, 'filetype', 'nyai')
-  vim.api.nvim_buf_set_option(buf, 'modified', false)
+  vim.api.nvim_set_option_value('filetype', 'nyai', { buf = buf })
+  vim.api.nvim_set_option_value('modified', false, { buf = buf })
 end
 
 function M.ready_to_edit()
