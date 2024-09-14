@@ -28,8 +28,8 @@ function M.new(args)
   end
 
   local function fill_lines(n)
-    local bottom = vim.fn.line('$')
-    local right = #vim.fn.getline(bottom)
+    local bottom = vim.api.nvim_buf_line_count(state.buf)
+    local right = #vim.api.nvim_buf_get_lines(state.buf, bottom - 1, bottom, true)[1]
     local new_lines = {}
 
     for _ = 0, n, 1 do
@@ -44,7 +44,7 @@ function M.new(args)
 
     local line, col = state.line, state.col
 
-    fill_lines(line - vim.fn.line('$'))
+    fill_lines(line - vim.api.nvim_buf_line_count(state.buf))
 
     local lines = vim.split(text, '\n')
 
@@ -68,7 +68,9 @@ function M.new(args)
     end
 
     if 1 < #lines then
-      vim.api.nvim_win_set_cursor(state.win, { state.line, 0 })
+      if vim.api.nvim_win_is_valid(state.win) then
+        vim.api.nvim_win_set_cursor(state.win, { state.line, 0 })
+      end
     end
   end
 
