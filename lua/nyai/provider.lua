@@ -75,6 +75,7 @@ end
 
 function M.openai(name, model_id)
   -- https://platform.openai.com/docs/api-reference/chat
+  -- https://platform.openai.com/docs/models
 
   local api_key = vim.env.OPENAI_API_KEY
 
