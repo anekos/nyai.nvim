@@ -8,7 +8,7 @@ function M.selected_text()
   local old = vim.fn.getreg('s', 1)
   vim.cmd('silent normal! gv"sy')
   local result = vim.fn.getreg('s', 1)
-  vim.fn.setreg('s', old, 1)
+  vim.fn.setreg('s', old)
   return result
 end
 
@@ -26,9 +26,9 @@ end
 
 function M.replace_selection(content)
   local old = vim.fn.getreg('s', 1)
-  vim.fn.setreg('s', content, 1)
+  vim.fn.setreg('s', content)
   vim.cmd('silent normal! gv"sp')
-  vim.fn.setreg('s', old, 1)
+  vim.fn.setreg('s', old)
 end
 
 function M.for_buffer_windows(bufnr, callback)
