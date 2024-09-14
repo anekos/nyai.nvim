@@ -68,7 +68,7 @@ function M.new(args)
     end
 
     if 1 < #lines then
-      if vim.api.nvim_win_is_valid(state.win) then
+      if vim.api.nvim_win_is_valid(state.win) and vim.fn.winbufnr(state.win) == state.buf then
         vim.api.nvim_win_set_cursor(state.win, { state.line, 0 })
       end
     end
