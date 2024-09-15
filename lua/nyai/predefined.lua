@@ -13,6 +13,8 @@ M.models = {
   provider.openai('OpenAI - GPT 4o mini', 'gpt-4o-mini'),
   provider.openai('OpenAI - GPT 4 Turbo', 'gpt-4-turbo'),
   provider.openai('OpenAI - GPT 3.5 Turbo', 'gpt-3.5-turbo'),
+  provider.openai('OpenAI - o1 preview', 'o1-preview'),
+  provider.openai('OpenAI - o1 mini', 'o1-mini'),
   -- https://docs.perplexity.ai/guides/model-cards
   provider.perplexity('Perplexity - Sonar Small Online 8B', 'llama-3.1-sonar-small-128k-online'),
   provider.perplexity('Perplexity - Sonar Large Online 70B', 'llama-3.1-sonar-small-128k-online'),
