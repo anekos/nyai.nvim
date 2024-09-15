@@ -50,7 +50,7 @@ function M.model(a)
     end,
   }, function(model)
     if model then
-      config.model = model
+      state.set_model(model.name)
     end
   end)
 end

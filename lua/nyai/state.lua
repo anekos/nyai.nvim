@@ -14,12 +14,9 @@ function M.all_models()
   return models
 end
 
-function M.get_model(name_or_id, nil_if_not_found)
+function M.get_model(name, nil_if_not_found)
   for _, model in ipairs(M.all_models()) do
-    if model.id == name_or_id then
-      return model
-    end
-    if model.name == name_or_id then
+    if model.name == name then
       return model
     end
   end
@@ -28,7 +25,7 @@ function M.get_model(name_or_id, nil_if_not_found)
     return nil
   end
 
-  error('Model not found: ' .. name_or_id)
+  error('Model not found: ' .. name)
 end
 
 function M.model_names()
@@ -43,18 +40,16 @@ function M.model_ids()
   end, M.all_models())
 end
 
-function M.set_model(name_or_id)
-  local model = M.get_model(name_or_id)
+function M.set_model(name)
+  local model = M.get_model(name)
   if model == nil then
-    error('Model not found: ' .. name_or_id)
+    error('Model not found: ' .. name)
   end
-  M.model = model
+  M.values.model_name = name
 end
 
 function M.default_model()
-  return M.get_model(M.values.model_id)
+  return M.get_model(M.values.model_name, true) or M.all_models()[1]
 end
-
-M.model_id = M.all_models()[1].id
 
 return M
