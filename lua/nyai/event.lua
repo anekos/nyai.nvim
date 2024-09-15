@@ -12,7 +12,7 @@ function M.on_filetype()
         action.run(context)
       end)
     else
-      vim.notify('Not in user context', 'warn')
+      vim.notify('Not in user context', vim.log.levels.WARN)
     end
   end, { buffer = true })
 end
