@@ -67,6 +67,7 @@ local function read_buffer()
   local current_line_number = vim.fn.line('.')
   local sections = {}
   local parameters = {}
+  local errors = {}
 
   local function read_parameter(line, overwrite)
     local parameter_name, parameter_value = parse_parameter_line(line)
@@ -128,15 +129,18 @@ local function read_buffer()
         if model.parameters[parameter_name] and model.parameters[parameter_name].validate(parameter_value) then
           parameters[parameter_name] = model.parameters[parameter_name].create(parameter_value)
         else
-          error('Invalid parameter value: ' .. parameter_name .. ' = ' .. parameter_value .. ' (L' .. ')')
+          table.insert(
+            errors,
+            'Invalid parameter value: ' .. parameter_name .. ' = ' .. parameter_value .. ' (L' .. ')'
+          )
         end
       end
     end
   else
-    error('Invalid model: ' .. parameter_lines.model)
+    table.insert(errors, 'Invalid model: ' .. parameter_lines.model)
   end
 
-  return sections, parameters, model
+  return sections, parameters, model, errors
 end
 
 function M.get_context(user_only)
@@ -145,7 +149,7 @@ function M.get_context(user_only)
   local result = {}
   local messages = {}
 
-  local sections, parameters, model = read_buffer()
+  local sections, parameters, model, errors = read_buffer()
 
   if not sections or #sections < 1 or (user_only and sections[#sections].role ~= 'user') then
     return nil
@@ -161,6 +165,7 @@ function M.get_context(user_only)
   result.parameters = parameters
   result.messages = messages
   result.model = model
+  result.errors = errors
 
   return result
 end

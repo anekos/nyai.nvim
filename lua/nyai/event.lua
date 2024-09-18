@@ -8,6 +8,11 @@ function M.on_filetype()
   vim.keymap.set({ 'n', 'i' }, '<C-CR>', function()
     local context = buffer.get_context(true)
     if context ~= nil then
+      if 0 < #context.errors then
+        vim.notify(vim.fn.join(context.errors, '\n'), vim.log.levels.ERROR)
+        return
+      end
+
       vim.schedule(function()
         action.run(context)
       end)
