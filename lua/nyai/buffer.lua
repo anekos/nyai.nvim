@@ -17,7 +17,7 @@ local extract_role = function(line)
 end
 
 local function parse_parameter_line(line)
-  return line:match('@(%w+)%s*=%s*(.+)')
+  return line:match('@([%w_]+)%s*=%s*(.+)')
 end
 
 local function get_syntax_name(line, col)
