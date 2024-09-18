@@ -129,10 +129,7 @@ local function read_buffer()
         if model.parameters[parameter_name] and model.parameters[parameter_name].validate(parameter_value) then
           parameters[parameter_name] = model.parameters[parameter_name].create(parameter_value)
         else
-          table.insert(
-            errors,
-            'Invalid parameter value: ' .. parameter_name .. ' = ' .. parameter_value .. ' (L' .. ')'
-          )
+          table.insert(errors, 'Invalid parameter value: ' .. parameter_name .. ' = ' .. parameter_value)
         end
       end
     end
