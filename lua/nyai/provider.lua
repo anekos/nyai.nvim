@@ -155,9 +155,8 @@ function M.perplexity(name, model_id)
 end
 
 function M.copilot(name)
-  local api_key = function()
-    return require('nyai.provider.copilot').authorize()
-  end
+  local copilot = require('nyai.provider.copilot')
+  local api_key = copilot.authorize
 
   return {
     name = name,
@@ -165,9 +164,9 @@ function M.copilot(name)
     request = function(context)
       return {
         url = 'https://api.githubcopilot.com/chat/completions',
-        headers = {
+        headers = vim.tbl_extend('force', copilot.common_headers, {
           ['Authorization'] = 'Bearer ' .. api_key(),
-        },
+        }),
         body = merge({
           model = context.model.id,
           messages = context.messages,
