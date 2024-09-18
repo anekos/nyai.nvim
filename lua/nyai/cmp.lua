@@ -17,6 +17,24 @@ local function model_names()
   return cached_model_names
 end
 
+local function prefixed(prefix, callback)
+  return function(candidates)
+    local filtered = {}
+    for _, candidate in ipairs(candidates) do
+      local value = candidate.insertText or candidate.label
+      if vim.startswith(value, prefix) then
+        table.insert(
+          filtered,
+          vim.tbl_extend('force', candidate, {
+            insertText = value:sub(#prefix),
+          })
+        )
+      end
+    end
+    return callback(filtered)
+  end
+end
+
 M.new = function()
   local self = setmetatable({}, { __index = M })
   return self
@@ -80,26 +98,28 @@ function M:complete(params, callback)
     buffer_context = buffer.get_context(false)
   end
 
-  local model = buffer_context and buffer_context.model
+  local key, value = ctx.cursor_before_line:match('^@([%w_]+)%s*=%s*(.*)')
 
-  if ctx.cursor_before_line:match('^@model%s*=%s*') then
-    return complete_model_names(callback)
+  if key == 'model' then
+    return complete_model_names(prefixed(value, callback))
   end
 
-  local parameter_name = ctx.cursor_before_line:match('^@([%w_]+)%s*=')
+  local model = buffer_context and buffer_context.model
 
-  if parameter_name then
+  if key then
     if model then
-      return complete_model_parameter_values(callback, model.parameters[parameter_name])
+      return complete_model_parameter_values(prefixed(value, callback), model.parameters[key])
     end
 
     callback {}
     return
   end
 
-  if ctx.cursor_before_line:match('^@') then
+  key = ctx.cursor_before_line:match('^(@[%w_]*)')
+
+  if key ~= nil then
     if model and model.parameters then
-      return complete_model_parameters(callback, model.parameters)
+      return complete_model_parameters(prefixed(key, callback), model.parameters)
     end
   end
 
