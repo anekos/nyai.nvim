@@ -50,6 +50,7 @@ local function complete_model_parameters(callback, model_parameters)
 
   for key, value in pairs(model_parameters) do
     table.insert(items, {
+      ---@diagnostic disable-next-line: redundant-parameter
       label = vim.fn.printf('@%s (%s)', key, value.description),
       kind = kind.Property,
       insertText = '@' .. key,
