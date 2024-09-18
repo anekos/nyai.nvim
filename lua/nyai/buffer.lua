@@ -69,11 +69,11 @@ local function read_buffer()
   local parameters = {}
   local errors = {}
 
-  local function read_parameter(line, overwrite)
+  local function read_parameter(ln, line, overwrite)
     local parameter_name, parameter_value = parse_parameter_line(line)
     if parameter_name and parameter_value then
       if overwrite or not parameter_lines[parameter_name] then
-        parameter_lines[parameter_name] = parameter_value
+        parameter_lines[parameter_name] = { value = parameter_value, ln = ln }
       end
     end
   end
@@ -83,7 +83,7 @@ local function read_buffer()
     local line = vim.fn.getline(ln)
 
     if is_parameter_line(syntax_name) then
-      read_parameter(line, true)
+      read_parameter(ln, line, true)
     elseif is_heading(syntax_name) then
       if extract_role(line) then
         end_line = ln - 1
@@ -103,7 +103,7 @@ local function read_buffer()
     local line = vim.fn.getline(ln)
 
     if is_parameter_line(syntax_name) then
-      read_parameter(line, false)
+      read_parameter(ln, line, false)
     elseif is_heading(syntax_name) then
       local line_role = extract_role(line)
       if line_role ~= nil then
@@ -121,15 +121,27 @@ local function read_buffer()
     end
   end
 
-  local model = state.get_model(parameter_lines.model, true) or state.default_model()
+  local model = state.default_model()
+  if parameter_lines.model then
+    model = state.get_model(parameter_lines.model.value, true)
+  end
 
   if model then
-    for parameter_name, parameter_value in pairs(parameter_lines) do
+    for parameter_name, parameter in pairs(parameter_lines) do
       if parameter_name ~= 'model' then
-        if model.parameters[parameter_name] and model.parameters[parameter_name].validate(parameter_value) then
-          parameters[parameter_name] = model.parameters[parameter_name].create(parameter_value)
+        if model.parameters[parameter_name] and model.parameters[parameter_name].validate(parameter.value) then
+          parameters[parameter_name] = model.parameters[parameter_name].create(parameter.value)
         else
-          table.insert(errors, 'Invalid parameter value: ' .. parameter_name .. ' = ' .. parameter_value)
+          table.insert(
+            errors,
+            'Invalid parameter value: '
+              .. parameter_name
+              .. ' = '
+              .. parameter.value
+              .. ' @'
+              .. tostring(parameter.ln)
+              .. 'L'
+          )
         end
       end
     end
