@@ -35,14 +35,12 @@ function M.get_trigger_characters()
 end
 
 local function complete_model_names(callback)
-  callback {
-    items = vim.tbl_map(function(name)
-      return {
-        label = name,
-        kind = kind.Value,
-      }
-    end, model_names()),
-  }
+  callback(vim.tbl_map(function(name)
+    return {
+      label = name,
+      kind = kind.Value,
+    }
+  end, model_names()))
 end
 
 local function complete_model_parameters(callback, model_parameters)
