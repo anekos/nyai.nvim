@@ -1,11 +1,12 @@
-local predefined = require('nyai.predefined')
 local config = require('nyai.config')
+local predefined = require('nyai.predefined')
+local util = require('nyai.util')
 
 local M = { values = {} }
 
 function M.all_models()
   local models = {}
-  for _, model in ipairs(config.user_models) do
+  for _, model in ipairs(util.value_or_function(config.user_models)) do
     table.insert(models, model)
   end
   for _, model in ipairs(predefined.models) do

@@ -8,7 +8,14 @@ local M = {}
 local last_state = nil
 local buffer_context = nil
 
-local model_names = state.model_names()
+local cached_model_names = nil
+
+local function model_names()
+  if cached_model_names == nil then
+    cached_model_names = state.model_names()
+  end
+  return cached_model_names
+end
 
 M.new = function()
   local self = setmetatable({}, { __index = M })
@@ -34,7 +41,7 @@ local function complte_model_names(callback)
         label = name,
         kind = kind.Value,
       }
-    end, model_names),
+    end, model_names()),
   }
 end
 
