@@ -34,6 +34,11 @@ function M.run(context)
         end
       end)
     end,
+    on_error = function(message)
+      renderer:remove_marker('Waiting')
+      renderer:finish()
+      vim.notify(message, vim.log.levels.ERROR)
+    end,
   }
 
   renderer:render('\n')

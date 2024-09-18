@@ -1,7 +1,15 @@
+local function debug(...)
+  local args = { ... }
+  vim.schedule(function()
+    vim.fn.writefile({ vim.fn.json_encode(args) }, '/tmp/xmosh/nvim-debug.log', 'a')
+  end)
+end
+
 return function(callbacks)
   local first = true
 
   local on_stream = function(err, line)
+    debug(line)
     if err then
       error('Failed to process a stream: ' .. tostring(err))
       return

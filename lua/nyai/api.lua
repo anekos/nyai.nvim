@@ -2,6 +2,17 @@ local curl = require('plenary.curl')
 
 local M = {}
 
+local function guard(callbacks, fn)
+  return function(...)
+    local ok, err = pcall(fn, ...)
+    if not ok then
+      vim.schedule(function()
+        callbacks.on_error(err)
+      end)
+    end
+  end
+end
+
 function M.chat_completions(request, callbacks)
   -- request = { url, headers, body, query, response }
 
@@ -15,7 +26,7 @@ function M.chat_completions(request, callbacks)
     headers = headers,
     body = vim.json.encode(request.body),
     timeout = 60 * 1000,
-    stream = response.on_stream,
+    stream = guard(callbacks, response.on_stream),
     callback = function(resp)
       if resp.status ~= 200 then
         error('API Error: ' .. resp.body)
