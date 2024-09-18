@@ -34,7 +34,7 @@ function M.get_trigger_characters()
   return { '@', '=', ' ' }
 end
 
-local function complte_model_names(callback)
+local function complete_model_names(callback)
   callback {
     items = vim.tbl_map(function(name)
       return {
@@ -85,7 +85,7 @@ function M:complete(params, callback)
   local model = buffer_context and buffer_context.model
 
   if ctx.cursor_before_line:match('^@model%s*=%s*') then
-    return complte_model_names(callback)
+    return complete_model_names(callback)
   end
 
   local parameter_name = ctx.cursor_before_line:match('^@([%w_]+)%s*=')
