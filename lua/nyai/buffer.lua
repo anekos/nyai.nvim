@@ -17,7 +17,15 @@ local extract_role = function(line)
 end
 
 local function parse_parameter_line(line)
-  return line:match('@([%w_]+)%s*=%s*(.+)')
+  local k, v = line:match('@([%w_]+)%s*=%s*(.+)')
+  if k == nil then
+    return nil
+  end
+  v = vim.fn.trim(v)
+  if v == '' then
+    return nil
+  end
+  return k, v
 end
 
 local function get_syntax_name(line, col)
@@ -146,7 +154,9 @@ local function read_buffer()
       end
     end
   else
-    table.insert(errors, 'Invalid model: ' .. parameter_lines.model)
+    if parameter_lines.model ~= nil then
+      table.insert(errors, 'Invalid model: ' .. parameter_lines.model.value)
+    end
   end
 
   return sections, parameters, model, errors
