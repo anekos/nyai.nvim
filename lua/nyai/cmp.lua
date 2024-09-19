@@ -5,6 +5,13 @@ local state = require('nyai.state')
 
 local M = {}
 
+local function debug(...)
+  local args = { ... }
+  vim.schedule(function()
+    vim.fn.writefile({ vim.fn.json_encode(args) }, '/tmp/xmosh/nvim-debug.log', 'a')
+  end)
+end
+
 local last_state = nil
 local buffer_context = nil
 
@@ -17,7 +24,11 @@ local function model_names()
   return cached_model_names
 end
 
-local function prefixed(prefix, callback)
+local function prefixed(prefix, ctx, callback)
+  local line = ctx.cursor_before_line
+  local cursor_col = ctx.cursor.col
+  local equal_sign_pos = line:find('=')
+
   return function(candidates)
     local filtered = {}
     for _, candidate in ipairs(candidates) do
@@ -26,7 +37,19 @@ local function prefixed(prefix, callback)
         table.insert(
           filtered,
           vim.tbl_extend('force', candidate, {
-            insertText = value:sub(#prefix),
+            textEdit = {
+              newText = value,
+              range = {
+                start = {
+                  line = ctx.cursor.line,
+                  character = equal_sign_pos,
+                },
+                ['end'] = {
+                  line = ctx.cursor.line,
+                  character = cursor_col - 1,
+                },
+              },
+            },
           })
         )
       end
@@ -45,7 +68,7 @@ M.is_available = function()
 end
 
 function M.get_keyword_pattern()
-  return [[\K\+]]
+  return [[\k\+]]
 end
 
 function M.get_trigger_characters()
@@ -101,14 +124,14 @@ function M:complete(params, callback)
   local key, value = ctx.cursor_before_line:match('^@([%w_]+)%s*=%s*(.*)')
 
   if key == 'model' then
-    return complete_model_names(prefixed(value, callback))
+    return complete_model_names(prefixed(value, ctx, callback))
   end
 
   local model = buffer_context and buffer_context.model
 
   if key then
     if model then
-      return complete_model_parameter_values(prefixed(value, callback), model.parameters[key])
+      return complete_model_parameter_values(prefixed(value, ctx, callback), model.parameters[key])
     end
 
     callback {}
@@ -119,7 +142,7 @@ function M:complete(params, callback)
 
   if key ~= nil then
     if model and model.parameters then
-      return complete_model_parameters(prefixed(key, callback), model.parameters)
+      return complete_model_parameters(callback, model.parameters)
     end
   end
 
