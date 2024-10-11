@@ -20,6 +20,14 @@ function M.on_filetype()
       vim.notify('Not in user context', vim.log.levels.WARN)
     end
   end, { buffer = true })
+
+  vim.keymap.set({ 'n' }, '<C-y>', function()
+    local content = buffer.current_scoped_text()
+    if content then
+      vim.fn.setreg('"', content)
+      vim.notify('Yanked text', vim.log.levels.INFO)
+    end
+  end, { buffer = true })
 end
 
 function M.on_vim_leave_pre()

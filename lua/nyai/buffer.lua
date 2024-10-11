@@ -226,4 +226,41 @@ function M.ready_to_edit()
   vim.cmd.startinsert()
 end
 
+function M.current_scoped_text()
+  local ln = vim.fn.line('.')
+  local start_line = nil
+  local end_line = nil
+
+  local function on_line(i)
+    local syntax_name = get_syntax_name(i, 1)
+    if syntax_name ~= 'markdownCodeDelimiter' then
+      return
+    end
+
+    if start_line == nil then
+      if i <= ln then
+        start_line = i + 1
+      end
+      return
+    end
+
+    if end_line == nil then
+      if ln <= i then
+        end_line = i - 1
+      end
+      return
+    end
+  end
+
+  for i = 1, vim.fn.line('$'), 1 do
+    on_line(i)
+  end
+
+  if start_line == nil or end_line == nil then
+    return vim.fn.join(vim.fn.getline(1, '$'), '\n')
+  end
+
+  return vim.fn.join(vim.fn.getline(start_line, end_line), '\n')
+end
+
 return M
