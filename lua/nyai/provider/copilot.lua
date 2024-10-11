@@ -12,7 +12,7 @@ M.common_headers = {
 }
 
 function M.authorize()
-  local token = vim.env.GITHUB_TOKEN
+  local token = vim.env.GITHUB_COPILOT_TOKEN or vim.env.GITHUB_TOKEN
 
   if authorized and authorized.expires_at and authorized.expires_at <= math.floor(os.time()) then
     return authorized.token
