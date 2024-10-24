@@ -72,7 +72,7 @@ function M.gemini(name)
   }
 end
 
-function M.openai(name, model_id)
+function M.openai(name, model_id, stream)
   -- https://platform.openai.com/docs/api-reference/chat
   -- https://platform.openai.com/docs/models
 
@@ -107,9 +107,9 @@ function M.openai(name, model_id)
         body = merge({
           model = model_id,
           messages = context.messages,
-          stream = true,
+          stream = stream,
         }, context.parameters),
-        response = require('nyai.api.response.openai'),
+        response = require('nyai.api.response.openai')(stream),
       }
     end,
   }
@@ -146,7 +146,7 @@ function M.perplexity(name, model_id)
           messages = context.messages,
           stream = true,
         }, context.parameters),
-        response = require('nyai.api.response.openai'),
+        response = require('nyai.api.response.openai')(true),
       }
     end,
   }
@@ -170,7 +170,7 @@ function M.copilot(name)
           messages = context.messages,
           stream = true,
         }, context.parameters),
-        response = require('nyai.api.response.openai'),
+        response = require('nyai.api.response.openai')(true),
       }
     end,
   }

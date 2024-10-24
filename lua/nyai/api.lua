@@ -3,6 +3,10 @@ local curl = require('plenary.curl')
 local M = {}
 
 local function guard(callbacks, fn)
+  if fn == nil then
+    return nil
+  end
+
   return function(...)
     local ok, err = pcall(fn, ...)
     if not ok then
@@ -31,7 +35,12 @@ function M.chat_completions(request, callbacks)
       if resp.status ~= 200 then
         error('API Error: ' .. resp.body)
       end
-      response.on_complete()
+      if response.on_response then
+        guard(callbacks, response.on_response)(vim.json.decode(resp.body))
+      end
+      if response.on_complete then
+        response.on_complete()
+      end
     end,
   }
 end

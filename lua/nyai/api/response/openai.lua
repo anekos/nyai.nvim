@@ -1,4 +1,4 @@
-return function(callbacks)
+local for_stream = function(callbacks)
   local first = true
 
   local on_stream = function(err, line)
@@ -51,4 +51,26 @@ return function(callbacks)
     on_stream = on_stream,
     on_complete = on_complete,
   }
+end
+
+local for_batch = function(callbacks)
+  local on_response = function(data)
+    vim.schedule(function()
+      callbacks.on_start()
+      callbacks.on_text(data.choices[1].message.content)
+      callbacks.on_end()
+    end)
+  end
+
+  return {
+    on_response = on_response,
+    on_complete = function() end,
+  }
+end
+
+return function(stream)
+  if stream then
+    return for_stream
+  end
+  return for_batch
 end
