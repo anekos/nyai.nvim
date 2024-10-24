@@ -15,7 +15,6 @@ function M.anthropic(name, model_id)
     name = name,
     parameters = {
       max_tokens = P.integer,
-      system = P.string,
       temperature = P.float,
       top_k = P.integer,
       top_p = P.float,
@@ -93,7 +92,6 @@ function M.openai(name, model_id)
       seed = P.integer,
       -- service_tier = 'string,
       stop = P.array(P.string),
-      stream = P.boolean,
       temperature = P.float,
       top_p = P.float,
       -- tools = 'array',
