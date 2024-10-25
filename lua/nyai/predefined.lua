@@ -4,8 +4,8 @@ local M = {}
 
 M.models = {
   -- https://docs.anthropic.com/en/docs/about-claude/models#model-names
-  provider.anthropic('Anthropic - Claude 3.5 Sonnet', 'claude-3-5-sonnet-20240620'),
-  provider.anthropic('Anthropic - Claude 3 Opus', 'claude-3-opus-20240229'),
+  provider.anthropic('Anthropic - Claude 3.5 Sonnet', 'claude-3-5-sonnet-latest'),
+  provider.anthropic('Anthropic - Claude 3 Opus', 'claude-3-opus-latest'),
   provider.anthropic('Anthropic - Claude 3 Sonnect', 'claude-3-sonnet-20240229'),
   provider.anthropic('Anthropic - Claude 3 Haiku', 'claude-3-haiku-20240307'),
   -- https://platform.openai.com/docs/models/gpt-4o-mini
