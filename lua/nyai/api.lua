@@ -17,7 +17,7 @@ local function guard(callbacks, fn)
   end
 end
 
-function M.chat_completions(request, callbacks)
+function M.call(request, callbacks)
   -- request = { url, headers, body, query, response }
 
   local headers = vim.tbl_extend('force', { ['Content-Type'] = 'application/json' }, request.headers or {})
