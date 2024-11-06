@@ -1,7 +1,10 @@
 local config = require('nyai.config')
 local api = require('nyai.api')
+local util = require('nyai.util')
 
 local M = {}
+
+local cmp_model = util.value_or_function(config.cmp_model)
 
 M.candidates = {}
 
@@ -14,7 +17,7 @@ function M.get_keyword_pattern()
 end
 
 function M.is_available()
-  return config.cmp_model ~= nil
+  return cmp_model ~= nil
 end
 
 function M:complete(params, callback)
@@ -28,11 +31,11 @@ function M:complete(params, callback)
     .. prev.cursor_before_line
   local suffix = '\n' .. vim.fn.join(vim.api.nvim_buf_get_lines(ctx.bufnr, ln + 1, -1, true), '\n')
 
-  if config.cmp_model == nil then
+  if cmp_model == nil then
     error('WTF')
   end
 
-  local p = config.cmp_model().request(prefix, suffix)
+  local p = cmp_model.request(prefix, suffix)
 
   local request = {
     url = p.url,
