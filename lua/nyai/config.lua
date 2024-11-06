@@ -1,5 +1,6 @@
 local M = {
   user_models = {},
+  cmp_model = nil,
   directory = vim.fn.expand('~/nyai'),
   insert_default_model = false,
   float_options = function()
