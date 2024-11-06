@@ -5,13 +5,6 @@ local state = require('nyai.state')
 
 local M = {}
 
-local function debug(...)
-  local args = { ... }
-  vim.schedule(function()
-    vim.fn.writefile({ vim.fn.json_encode(args) }, '/tmp/xmosh/nvim-debug.log', 'a')
-  end)
-end
-
 local last_state = nil
 local buffer_context = nil
 
