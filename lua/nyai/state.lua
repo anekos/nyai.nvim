@@ -15,6 +15,10 @@ function M.all_models()
   return models
 end
 
+function M.cmp_model()
+  return util.value_or_function(config.cmp_model)
+end
+
 function M.get_model(name, nil_if_not_found)
   for _, model in ipairs(M.all_models()) do
     if model.name == name then
