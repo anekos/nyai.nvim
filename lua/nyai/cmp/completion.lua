@@ -1,3 +1,5 @@
+local types = require('cmp.types')
+
 local state = require('nyai.state')
 local api = require('nyai.api')
 
@@ -47,10 +49,25 @@ function M:complete(params, callback)
     response = function()
       return {
         on_response = function(data)
+          local full = data.response
+          local short = full:match('([^\n]+)') or ''
+          if #short > 50 then
+            short = short:sub(1, 47) .. '...'
+          end
           callback {
             {
-              label = 'nyai',
-              insertText = data.response,
+              label = short,
+              kind = types.lsp.CompletionItemKind.Snippet,
+              cmp = {
+                kind_hl_group = 'CmpItemKindSnippet',
+                kind_text = 'Nyai',
+              },
+              insertText = full,
+              filterText = full,
+              documentation = {
+                kind = 'plaintext',
+                value = full,
+              },
             },
           }
         end,
