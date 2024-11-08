@@ -1,7 +1,5 @@
-local config = require('nyai.config')
 local state = require('nyai.state')
 local api = require('nyai.api')
-local util = require('nyai.util')
 
 local M = {}
 
