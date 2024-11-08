@@ -45,7 +45,7 @@ function M.run(context)
   renderer:render(text.Waiting .. '\n', { marker_name = 'Waiting' })
   vim.cmd.stopinsert()
 
-  api.chat_completions(request, callbacks)
+  api.call(request, callbacks)
 end
 
 return M

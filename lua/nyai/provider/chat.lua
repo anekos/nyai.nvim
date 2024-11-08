@@ -153,7 +153,7 @@ function M.perplexity(name, model_id)
 end
 
 function M.copilot(name)
-  local copilot = require('nyai.provider.copilot')
+  local copilot = require('nyai.provider.chat.copilot')
   local api_key = copilot.authorize
 
   return {

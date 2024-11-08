@@ -15,6 +15,7 @@ function M.setup(opts)
 
   apply('model')
   apply('user_models')
+  apply('cmp_model')
   apply('insert_default_model')
   apply('api_end_point')
   apply('api_key')
