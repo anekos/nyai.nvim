@@ -10,7 +10,11 @@ function M.new()
 end
 
 function M.get_keyword_pattern()
-  return [[\k\+]]
+  return ''
+end
+
+function M.get_trigger_characters()
+  return {}
 end
 
 function M.is_available()
