@@ -24,7 +24,7 @@ M.models = {
   chat.perplexity('Perplexity - Instruct Small 8B', 'llama-3.1-8b-instruct'),
   chat.perplexity('Perplexity - Instruct Large 70B', 'llama-3.1-70b-instruct'),
   -- No models
-  chat.copilot('Github - Copilot'),
+  chat.copilot('Github - Copilot', nil),
   chat.gemini('Google - Gemini'),
 }
 

@@ -152,7 +152,7 @@ function M.perplexity(name, model_id)
   }
 end
 
-function M.copilot(name)
+function M.copilot(name, model_id)
   local copilot = require('nyai.provider.chat.copilot')
   local api_key = copilot.authorize
 
@@ -166,7 +166,7 @@ function M.copilot(name)
           ['Authorization'] = 'Bearer ' .. api_key(),
         }),
         body = merge({
-          model = context.model.id,
+          model = model_id,
           messages = context.messages,
           stream = true,
         }, context.parameters),
